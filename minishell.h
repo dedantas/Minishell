@@ -24,5 +24,6 @@ int	exec_buitins(t_shell *shell);
 int	mini_env(char **env);
 int	mini_pwd(void);
 int	mini_echo(char **cmd);
+int	mini_exit(t_shell *shell);
 
 #endif
