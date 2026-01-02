@@ -20,5 +20,9 @@ typedef struct s_shell
 
 char	**ft_envdup(char **arr);
 void	free_shell(char *line, char **args);
+int	exec_buitins(t_shell *shell);
+int	mini_env(char **env);
+int	mini_pwd(void);
+int	mini_echo(char **cmd);
 
 #endif

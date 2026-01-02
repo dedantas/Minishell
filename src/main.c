@@ -18,10 +18,9 @@ int main(int ac, char **av, char **envp)
 		if (shell.line)
 		{
 			shell.args = ft_split(shell.line, ' ');
-		//	exec_buitins(&shell)
+			exec_buitins(&shell);
 			add_history(shell.line);
 		}
-		printf("Você digitou: %s\n", shell.line);
 		free_shell(shell.line, shell.args);
 	}
 
