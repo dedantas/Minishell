@@ -3,14 +3,18 @@ NAME = minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
+LIBFT		= libft/libft.a
 SRC			= src/main.c
 OBJ			= $(SRC:.c=.o)
 #SANITIZER	= -fsanitize=thread
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(SANITIZER)
+$(NAME): $(LIBFT) $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -lreadline -o $(NAME) $(SANITIZER)
+
+$(LIBFT):
+	make -C libft
 
 clean:
 	rm -f $(OBJ)
