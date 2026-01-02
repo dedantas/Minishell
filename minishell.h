@@ -1,8 +1,8 @@
 #ifndef MINISHEL_H
 # define MINISHEL_H
 
-// #include <readline/readline.h>
-// #include <readline/history.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 #include "libft/libft.h"
 #include <stdio.h>
