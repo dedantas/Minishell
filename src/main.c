@@ -1,21 +1,29 @@
 #include "../minishell.h"
 
-int main(void)
+int main(int ac, char **av, char **envp)
 {
-    char    *line;
-    while(1)
-    {
-        line = readline("🔹 minishell$ ");
-        if (!line)
-        {
-            printf("exit\n");
-            break;
-        }
-        if (*line)
-            add_history(line);
-        printf("Você digitou: %s\n", line);
-        free(line);
-    }
+	(void)ac;
+	(void)av;
+	t_shell	shell;
 
-    return 0;
+	shell.envp = ft_envdup(envp);
+	while(1)
+	{
+		shell.line = readline("🔹 minishell$ ");
+		if (!shell.line)
+		{
+			printf("exit\n");
+			break ;
+		}
+		if (shell.line)
+		{
+			shell.args = ft_split(shell.line, ' ');
+		//	exec_buitins(&shell)
+			add_history(shell.line);
+		}
+		printf("Você digitou: %s\n", shell.line);
+		free_shell(shell.line, shell.args);
+	}
+
+    return (0);
 }

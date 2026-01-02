@@ -4,7 +4,7 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
 LIBFT		= libft/libft.a
-SRC			= src/main.c
+SRC			= src/main.c src/ultils.c
 OBJ			= $(SRC:.c=.o)
 #SANITIZER	= -fsanitize=thread
 
