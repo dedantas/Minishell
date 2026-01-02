@@ -11,5 +11,9 @@
 #include <signal.h>
 #include <sys/wait.h>
 
+typedef struct s_shell
+{
+    char **env; // GLOBAL
+} t_shell;
 
 #endif
