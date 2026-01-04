@@ -18,13 +18,25 @@ char	**ft_envdup(char **arr)
 	return (new);
 }
 
-void	free_shell(char *line, char **args)
+void	free_shell(t_shell *shell)
 {
 	int	i;
 
-	i = 0;
-	while (args && args[i])
-		free(args[i++]);
-	free(args);
-	free(line);
+	if (shell->line)
+		free(shell->line);
+	t_token *tmp;
+	while (shell->cmds)
+	{
+		tmp = shell->cmds;
+		shell->cmds = shell->cmds->next;
+		free(tmp->value);
+		free(tmp);
+	}
+	if (shell->env)
+	{
+		i = 0;
+		while (shell->env[i++])
+			free(shell->env[i]);
+		free(shell->env);
+	}
 }
