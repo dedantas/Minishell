@@ -9,14 +9,14 @@ int	exec_buitins(t_shell *shell)
         if (ft_strncmp(shell->args[0], "echo", 4) == 0)
                 return (mini_echo(shell->args), 0);
         if (ft_strncmp(shell->args[0], "cd", 2) == 0)
-                return (printf("certo\n"), 0);
+                return (mini_cd(shell->args, shell), 0);
         if (ft_strncmp(shell->args[0], "pwd", 3) == 0)
                 return (mini_pwd(), 0);
         if (ft_strncmp(shell->args[0], "env", 3) == 0)
                 return (mini_env(shell->envp), 0);
         if (ft_strncmp(shell->args[0], "export", 6) == 0)
-                return (printf("certo\n"), 0);
+                return (mini_export(shell, shell->args), 0);
         if (ft_strncmp(shell->args[0], "unset", 5) == 0)
-                return (printf("certo\n"), 0);
+                return (mini_unset(shell, shell->args), 0);
         return (1);
 }
