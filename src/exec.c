@@ -13,7 +13,7 @@ int	exec_buitins(t_shell *shell)
         if (ft_strncmp(shell->cmds->args[0], "pwd", 3) == 0)
                 return (mini_pwd(), 0);
         if (ft_strncmp(shell->cmds->args[0], "env", 3) == 0)
-                return (mini_env(shell->envp), 0);
+                return (mini_env(shell->env), 0);
         if (ft_strncmp(shell->cmds->args[0], "export", 6) == 0)
                 return (mini_export(shell, shell->cmds->args), 0);
         if (ft_strncmp(shell->cmds->args[0], "unset", 5) == 0)
