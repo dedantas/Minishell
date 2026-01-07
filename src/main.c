@@ -5,7 +5,7 @@ int main(void)
     char    *line;
     while(1)
     {
-        line = readline("minishell$ ");
+        line = readline("🔹 minishell$ ");
         if (!line)
         {
             printf("exit\n");
