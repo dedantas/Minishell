@@ -3,9 +3,9 @@ NAME = minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
-LIBFT		= libft/libft.a
-SRC			= src/main.c
-OBJ			= $(SRC:.c=.o)
+LIBFT	= libft/libft.a
+SRC	= src/main.c src/ultils.c src/lexer.c
+OBJ	= $(SRC:.c=.o)
 #SANITIZER	= -fsanitize=thread
 
 all: $(NAME)
