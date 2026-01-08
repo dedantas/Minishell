@@ -15,7 +15,7 @@ typedef enum e_type // enum para saber o tipo de token
 {
 	WORD,
 	PIPE,	 // |
-	IN,	 // <
+	IN,	 	 // <
 	OUT,	 // >
 	APPEND,	 // >>
 	HEREDOC, // <<
@@ -60,6 +60,27 @@ char	*ft_strjoin3(const char *s1, const char *s2, const char *s3);
 void	add_env_var(t_shell *shell, const char *name, const char *value);
 void	up_env_var(t_shell *shell, const char *str, int eq);
 void	export_error(char *arg);*/
+
+// ultils
+int	ft_strcmp(const char *s1, const char *s2);
+
 t_token	*lexer(char *line);
+int mini_pwd(t_shell *shell);               // pode precisar de env no futuro, por agora vazio
+int mini_env(t_shell *shell);               // usa shell->env
+int mini_echo(t_cmd *cmd);                  // só usa cmd->args
+int mini_exit(t_cmd *cmd, t_shell *shell);  // precisa de args e free
+int mini_cd(t_cmd *cmd, t_shell *shell);
+int mini_export(t_cmd *cmd, t_shell *shell);
+int mini_unset(t_cmd *cmd, t_shell *shell);
+
+// Funções auxiliares (adiciona os protótipos para evitar implicit declaration)
+int mini_env2(char **env);
+void up_env_var(t_shell *shell, const char *str, int eq);
+void export_error(char *arg);
+
+// Executor e helpers
+int executor(t_shell *shell);
+int is_builtin(char *cmd_name);
+int exec_builtin(t_cmd *cmd, t_shell *shell);
 
 #endif
