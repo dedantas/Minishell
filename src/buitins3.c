@@ -1,18 +1,18 @@
 #include "../minishell.h"
 
-int	mini_env2(char **envp)
+int	mini_env2(char **env)
 {
 	int		i;
 	char	*eq_pos;
 	
 	i = 0;
-	while (envp[i])
+	while (env[i])
 	{
-		eq_pos = ft_strchr(envp[i], '=');
+		eq_pos = ft_strchr(env[i], '=');
 		if (eq_pos)
 		{
 			ft_putstr_fd("declare -x ", STDOUT_FILENO);
-			write(STDOUT_FILENO, envp[i], eq_pos - envp[i] + 1);
+			write(STDOUT_FILENO, env[i], eq_pos - env[i] + 1);
 			ft_putchar_fd('"', STDOUT_FILENO);
 			ft_putstr_fd(eq_pos + 1, STDOUT_FILENO);
 			ft_putendl_fd("\"", STDOUT_FILENO);
@@ -44,10 +44,10 @@ void	add_env_var(t_shell *shell, const char *name, const char *value)
 	char	**new_env;
 	char	*new_var;
 	
-	if (!shell || !shell->envp || !name)
+	if (!shell || !shell->env || !name)
 		return;
 	count = 0;
-	while (shell->envp[count])
+	while (shell->env[count])
 		count++;
 	new_var = ft_strjoin3(name, "=", value);
 	if (!new_var)
@@ -60,11 +60,11 @@ void	add_env_var(t_shell *shell, const char *name, const char *value)
 	}
 	j = -1;
 	while (j++ < count)
-		new_env[j] = shell->envp[j];
+		new_env[j] = shell->env[j];
 	new_env[count] = new_var;
 	new_env[count + 1] = NULL;
-	free(shell->envp);
-	shell->envp = new_env;
+	free(shell->env);
+	shell->env = new_env;
 }
 
 void	up_env_var(t_shell *shell, const char *str, int eq)
@@ -74,7 +74,7 @@ void	up_env_var(t_shell *shell, const char *str, int eq)
 	char	*name;
 	char	*value;
 
-	if (!shell || !shell->envp || !str || eq <= 0)
+	if (!shell || !shell->env || !str || eq <= 0)
 		return ;
 	name = ft_substr(str, 0, eq);
 	value = ft_strdup(str + eq + 1);
@@ -86,13 +86,13 @@ void	up_env_var(t_shell *shell, const char *str, int eq)
 		return ;
 	}
 	i = 0;
-	while (shell->envp[i])
+	while (shell->env[i])
 	{
-		if (ft_strncmp(shell->envp[i], name, ft_strlen(name)) == 0
-			&& shell->envp[i][ft_strlen(name)] == '=')
+		if (ft_strncmp(shell->env[i], name, ft_strlen(name)) == 0
+			&& shell->env[i][ft_strlen(name)] == '=')
 		{
-			free(shell->envp[i]);
-			shell->envp[i] = new_var;
+			free(shell->env[i]);
+			shell->env[i] = new_var;
 			free(name);
 			free(value);
 			return ;
