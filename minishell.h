@@ -14,12 +14,11 @@
 typedef enum e_type // enum para saber o tipo de token
 {
 	WORD,
-	PIPE,	 // |
-	IN,	 	 // <
+	PIPE,	// |
+	IN,	// <
 	OUT,	 // >
 	APPEND,	 // >>
 	HEREDOC, // <<
-	DOLLAR,  // $
 } t_type;
 
 typedef struct s_token // lista de tokens
@@ -29,11 +28,18 @@ typedef struct s_token // lista de tokens
 	struct s_token	*next;
 } t_token;
 
+typedef struct s_redir // lista de redirecionamento
+{
+	t_type		type;
+	char		*file;      // nome do arquivo ou delimitador
+	int		heredoc_fd; // fd de heredoc se type == HERE
+	struct s_redir	*next;
+} t_redir;
+
 typedef struct s_cmd // lista de comandos
 {
 	char		**args;
-	int		infile;
-	int		outfile;
+	t_redir		*redirs;
 	struct s_cmd	*next;
 } t_cmd;
 
@@ -47,24 +53,15 @@ typedef struct s_shell
 
 char	**ft_envdup(char **arr);
 void	free_shell(t_shell *shell);
-/*int	exec_buitins(t_shell *shell);
-int	mini_env(char **env);
-int	mini_pwd(void);
-int	mini_echo(char **cmd);
-int	mini_exit(t_shell *shell);
-int	mini_cd(char **args, t_shell *shell);
-int	mini_unset(t_shell *shell, char **args);
-int	mini_export(t_shell *shell, char **args);
-int	mini_env2(char **envp);
-char	*ft_strjoin3(const char *s1, const char *s2, const char *s3);
-void	add_env_var(t_shell *shell, const char *name, const char *value);
-void	up_env_var(t_shell *shell, const char *str, int eq);
-void	export_error(char *arg);*/
 
 // ultils
 int	ft_strcmp(const char *s1, const char *s2);
+void	free_tokens(t_token *tokens);
+void	free_cmds(t_cmd *cmds);
 
 t_token	*lexer(char *line);
+t_cmd	*parser(t_token *tokens);
+int heredoc_handle(t_shell *shell);
 int mini_pwd(t_shell *shell);               // pode precisar de env no futuro, por agora vazio
 int mini_env(t_shell *shell);               // usa shell->env
 int mini_echo(t_cmd *cmd);                  // só usa cmd->args

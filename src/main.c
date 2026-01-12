@@ -1,28 +1,105 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/12 18:31:07 by dedantas          #+#    #+#             */
+/*   Updated: 2026/01/12 18:35:03 by dedantas         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
-int main(int ac, char **av, char **envp)
+void print_tokens(t_token *tokens)
+{
+    int i = 0;
+    while (tokens)
+    {
+        printf("Token: %d, Value: %s\n", tokens->type, tokens->value);
+        tokens = tokens->next;
+        i++;
+    }
+}
+
+void print_cmds(t_cmd *cmds)
+{
+    int i;
+    int cmd_num = 0;
+    t_redir *r;
+
+    while (cmds)
+    {
+        printf("Cmd %d:\n", cmd_num);
+        if (cmds->args)
+        {
+            i = 0;
+            while (cmds->args[i])
+	    {
+                printf("  Arg[%d]: %s\n", i, cmds->args[i]);
+		i++;
+	    }
+        }
+
+        r = cmds->redirs;
+        while (r)
+        {
+            printf("  Redir: type=%d, file=%s\n", r->type, r->file);
+            r = r->next;
+        }
+
+        cmds = cmds->next;
+        cmd_num++;
+    }
+}
+
+int	main(int ac, char **av, char **envp)
 {
 	(void)ac;
 	(void)av;
 	t_shell	shell;
-
 	shell.env = ft_envdup(envp);
-	while(1)
+
+	while (1)
 	{
 		shell.line = readline("🔹 minishell$ ");
-		add_history(shell.line);
+		if (!shell.line)
+			break; // Ctrl+D
+		if (*shell.line)
+			add_history(shell.line);
+
+		// --- Lexer ---
 		shell.tokens = lexer(shell.line);
-		t_token *tmp = shell.tokens; //test
-		while (tmp) //test
+		printf("🔹 Tokens before expansion:\n");
+		print_tokens(shell.tokens);
+
+		// --- Parser ---
+		shell.cmds = parser(shell.tokens);
+		if (!shell.cmds)
 		{
-			printf("Token: %d, Value: %s\n", tmp->type, tmp->value);
-			tmp = tmp->next;
+			printf("⚠️ Parser error, skipping line\n");
+			free_shell(&shell);
+			continue;
 		}
-		//exec_buitins(&shell);
+		// --- Test Heredoc ---
+		if (heredoc_handle(&shell) != 0)
+		{
+			printf("⚠️ Heredoc error, skipping line\n");
+			free_shell(&shell);
+			continue;
+		}
+
+		// --- Print parsed commands ---
+		print_cmds(shell.cmds);
+
+
+		// --- Cleanup ---
 		free_shell(&shell);
 	}
+
 	free_shell(&shell);
-	return (0);
+	return 0;
 }
 
 /*

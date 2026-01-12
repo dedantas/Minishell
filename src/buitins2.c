@@ -1,35 +1,45 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   buitins2.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/12 18:58:02 by dedantas          #+#    #+#             */
+/*   Updated: 2026/01/12 19:02:58 by dedantas         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
-static void update_pwd_env(t_shell *shell, const char *old)
+static void	update_pwd_env(t_shell *shell, const char *old)
 {
-    char buf[PATH_MAX];
-    int i;
-
-    // OLDPWD
-    i = 0;
-    while (shell->env && shell->env[i] && ft_strncmp(shell->env[i], "OLDPWD=", 7) != 0)
-        i++;
-    if (shell->env && shell->env[i])
-    {
-        free(shell->env[i]);
-        shell->env[i] = ft_strjoin("OLDPWD=", old ? old : "");
-    }
-
-    // PWD
-    if (getcwd(buf, sizeof(buf)) != NULL)
-    {
-        i = 0;
-        while (shell->env && shell->env[i] && ft_strncmp(shell->env[i], "PWD=", 4) != 0)
-            i++;
-        if (shell->env && shell->env[i])
-        {
-            free(shell->env[i]);
-            shell->env[i] = ft_strjoin("PWD=", buf);
-        }
-    }
+	char	buf[PATH_MAX];
+	int i;
+	// OLDPWD
+	i = 0;
+	while (shell->env && shell->env[i] && ft_strncmp(shell->env[i], "OLDPWD=", 7) != 0)
+		i++;
+	if (shell->env && shell->env[i])
+	{
+		free(shell->env[i]);
+		shell->env[i] = ft_strjoin("OLDPWD=", old ? old : "");
+	}
+	// PWD
+	if (getcwd(buf, sizeof(buf)) != NULL)
+	{
+		i = 0;
+		while (shell->env && shell->env[i] && ft_strncmp(shell->env[i], "PWD=", 4) != 0)
+			i++;
+		if (shell->env && shell->env[i])
+		{
+			free(shell->env[i]);
+			shell->env[i] = ft_strjoin("PWD=", buf);
+		}
+	}
 }
 
-static char *ft_getenv(char **env, const char *name)
+static char	*ft_getenv(char **env, const char *name)
 {
     int     i;
     size_t  len;
