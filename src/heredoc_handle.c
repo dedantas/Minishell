@@ -20,7 +20,7 @@ static int child_exit_code(void)
 }*/
 
 // filho lê o heredoc
-static int child_heredoc(t_shell *shell, int pipe_fd[2], char *delimiter)
+static int child_heredoc(int pipe_fd[2], char *delimiter)
 {
 	char *line;
 
@@ -46,8 +46,7 @@ static int child_heredoc(t_shell *shell, int pipe_fd[2], char *delimiter)
 	}
 
 	close(pipe_fd[1]);
-	free_shell(shell); // libera apenas shell->line, tokens e cmds se quiser
-	exit(EXIT_FAILURE);
+	exit(EXIT_SUCCESS);
 }
 
 // pai espera e retorna fd de leitura
@@ -67,7 +66,7 @@ static int parent_heredoc(int pipe_fd[2], pid_t pid)
 }
 
 // função principal
-int heredoc_read(t_shell *shell, char *delimiter)
+int heredoc_read(char *delimiter)
 {
 	pid_t pid;
 	int pipe_fd[2];
@@ -85,7 +84,7 @@ int heredoc_read(t_shell *shell, char *delimiter)
 		return 1;
 	}
 	if (pid == 0)
-		exit(child_heredoc(shell, pipe_fd, delimiter));
+		exit(child_heredoc(pipe_fd, delimiter));
 	else
 		return parent_heredoc(pipe_fd, pid);
 }
@@ -103,7 +102,7 @@ int heredoc_handle(t_shell *shell)
 		{
 			if (redir->type == HEREDOC)
 			{
-				redir->heredoc_fd = heredoc_read(shell, redir->file);
+				redir->heredoc_fd = heredoc_read(redir->file);
 				if (redir->heredoc_fd == -1)
 					return (1);
 			}

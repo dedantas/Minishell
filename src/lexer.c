@@ -114,11 +114,13 @@ t_token *lexer(char *line)
 		{
 			value = read_single_quote(&line);
 			add_token(&tokens, new_token(WORD, value));
+			free(value);
 		}
 		else if (*line == '"')
 		{
 			value = read_double_quote(&line);
 			add_token(&tokens, new_token(WORD, value));
+			free(value);
 		}
 		else if (*line == '|')
 		{
@@ -149,6 +151,7 @@ t_token *lexer(char *line)
 		{
 			value = read_word(&line);
 			add_token(&tokens, new_token(WORD, value));
+			free(value);
 		}
 	}
 	return tokens;

@@ -67,6 +67,7 @@ void	add_redir(t_cmd *cmd, t_type type, char *file)
 	redir = malloc(sizeof(t_redir));
 	redir->type = type;
 	redir->file = ft_strdup(file);
+	redir->heredoc_fd = -1;
 	redir->next= NULL;
 	if (!cmd->redirs)
 		cmd->redirs = redir;
@@ -110,11 +111,13 @@ t_cmd *parser(t_token *tokens)
 		}
 		else if (tokens->type == PIPE)
 		{
-			if (!current->args || !tokens->next || tokens->next->type == PIPE)
+			if (!current->args || !tokens->next)
 				return (printf("syntax error near |\n"), NULL);
 			current = NULL;
 		}
 		tokens = tokens->next;
 	}
+	if (current && !current->args)
+		return (printf("syntax error near unexpected token `newline'\n"), NULL);
 	return (cmds);
 }
