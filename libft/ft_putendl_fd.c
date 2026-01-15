@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_putendl_fd.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/10 19:38:11 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:26:16 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 18:03:35 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/17 12:51:37 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,8 @@ void	ft_putendl_fd(char *s, int fd)
 {
 	if (s)
 	{
-		write(fd, s, ft_strlen(s));
+		while (*s)
+			write(fd, s++, 1);
 		write(fd, "\n", 1);
 	}
 }
-/*
-int	main(int argc, char **argv)
-{
-	// ft_putendl_fd: Escreve uma string seguida de um nova linha.
-	ft_putendl_fd("hello", 1);
-	return (0);
-}
-*/

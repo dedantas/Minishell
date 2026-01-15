@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_memchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/31 19:05:07 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:21:55 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:07:51 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/10 15:36:00 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,16 @@
 
 void	*ft_memchr(const void *s, int c, size_t n)
 {
-	unsigned char	*ptr;
-	size_t			i;
+	const unsigned char	*p;
+	unsigned char		uc;
 
-	ptr = (unsigned char *)s;
-	i = 0;
-	while (i < n)
+	p = (const unsigned char *)s;
+	uc = (unsigned char)c;
+	while (n-- > 0)
 	{
-		if (ptr[i] == (unsigned char)c)
-			return ((void *)(ptr + i));
-		i++;
+		if (*p == uc)
+			return ((void *)p);
+		p++;
 	}
 	return (NULL);
 }
-/*
-int main(int argc, char **argv)
-{
-	//ft_memchr: Busca um valor especifico dentro de um area de memoria
-	char src[] = "Hello, World!";
-	printf("ft_memchr(%s): %p\n", src, ft_memchr(src, 'W', 13));
-	return (0);
-}
-*/

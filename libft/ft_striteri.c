@@ -3,40 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   ft_striteri.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/10 16:37:57 by codespace         #+#    #+#             */
-/*   Updated: 2024/11/10 22:06:38 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:11:40 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/10 14:11:44 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	ft_striteri(char *s, void (*f)(unsigned int, char *))
+void	ft_striteri(char *s, void (*f)(unsigned int, char*))
 {
 	unsigned int	i;
 
 	i = 0;
-	while (s[i] != '\0')
+	if (!s || !f)
+		return ;
+	while (s[i])
 	{
 		f(i, &s[i]);
 		i++;
 	}
 }
-/*
-void	ft_putchar(unsigned int i, char *c)
-{
-	write(1, c, 1);
-}
-
-int	main(int argc, char **argv)
-{
-	// ft_striteri: aplica uma funcao fornecida a cada char
-	// passando o indice desse char como argumento para essa funcao.
-	if (argc == 2)
-	{
-		ft_striteri(argv[1], ft_putchar);
-	}
-	return (0);
-}
-*/

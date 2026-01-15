@@ -3,40 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   ft_isalpha.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/21 20:59:39 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:19:28 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:19:17 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/10 14:19:19 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static	int	isupper(int c)
-{
-	if (!(c >= 'A' && c <= 'Z'))
-		return (0);
-	return (1);
-}
-
-static	int	islower(int c)
-{
-	if (!(c >= 'a' && c <= 'z'))
-		return (0);
-	return (1);
-}
-
 int	ft_isalpha(int c)
 {
-	return (isupper(c) || islower(c));
-}
-/*
-int	main(int argc, char **argv)
-{
-	// ft_isalpha: Verifica se todos os valores fazem parte do alfabeto
-	if (argc < 2)
+	if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122))
 		return (1);
-	printf("ft_isalpha(%c): %i\n", argv[1][0], ft_isalpha(argv[1][0]));
 	return (0);
 }
-*/

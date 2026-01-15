@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/31 21:19:46 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 20:09:03 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:02:01 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/10 14:02:03 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,40 +14,23 @@
 
 int	ft_atoi(const char *str)
 {
-	int		result;
-	int		sign;
-	int		i;
+	int	num;
+	int	sign;
 
-	result = 0;
+	num = 0;
 	sign = 1;
-	i = 0;
-	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
+	while ((*str >= 9 && *str <= 13) || *str == 32)
+		str++;
+	if (*str == '-' || *str == '+')
 	{
-		i++;
-	}
-	if (str[i] == '-' || str[i] == '+')
-	{
-		if (str[i] == '-')
+		if (*str == '-')
 			sign = -1;
-		i++;
+		str++;
 	}
-	while (str[i] >= '0' && str[i] <= '9')
+	while (*str >= '0' && *str <= '9')
 	{
-		result = (result * 10) + (str[i] - '0');
-		i++;
+		num = num * 10 + (*str - '0');
+		str++;
 	}
-	return (sign * result);
+	return (num * sign);
 }
-/*
-// ATOI: converte string em inteiro
-
-int main(int argc, char **argv)
-{
-	if (argc == 2)
-	{
-		printf("ft_atoi: %d\n", ft_atoi(argv[1]));
-		printf("atoi: %d\n", atoi(argv[1]));
-	}
-	return (0);
-}
-*/

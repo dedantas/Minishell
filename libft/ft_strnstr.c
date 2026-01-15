@@ -3,42 +3,38 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strnstr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/31 20:49:36 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:36:41 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:12:06 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/17 18:54:34 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strnstr(const char *big, const char *little, size_t n)
+char	*ft_strnstr(const char *haystack, const char *needle, size_t len)
 {
-	size_t	len;
+	size_t	needle_len;
 
-	if (*little == 0)
-		return ((char *)big);
-	len = ft_strlen(little);
-	if (len == 0)
-		return (0);
-	while (*big && n >= len)
+	if (*needle == '\0')
+		return ((char *)haystack);
+	needle_len = ft_strlen(needle);
+	while (*haystack != '\0' && len >= needle_len)
 	{
-		if (ft_strncmp(big, little, len) == 0)
-			return ((char *)big);
-		big++;
-		n--;
+		if (ft_memcmp(haystack, needle, needle_len) == 0)
+			return ((char *)haystack);
+		haystack++;
+		len--;
 	}
 	return (NULL);
 }
-/*
-int main(int argc, char **argv)
+
+/*int	main()
 {
-	// ft_strnstr: Busca uma substr em uma str principal.
-	if (argc == 4)
-	{
-		printf("ft_strnstr: %s\n", ft_strnstr(argv[1], argv[2], atoi(argv[3])));
-		printf("strnstr: %s\n", strnstr(argv[1], argv[2], atoi(argv[3])));
-	}
-	return (0);
-}
-*/
+	printf("%s\n", ft_strnstr("lorem ipsum dolor sit amet", "ipsum", 15));
+	printf("%s\n", ft_strnstr("lorem ipsum dolor sit amet", "dolor", 15));
+	printf("%s\n", ft_strnstr("lorem ipsum dolor sit amet", "", 10));
+	printf("%s\n", ft_strnstr("lorem ipsum dolor sit amet", "sit", 10));
+	printf("%s\n", ft_strnstr("lorem ipsum dolor sit amet", "dolor", 0));
+
+}*/

@@ -3,30 +3,37 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strlen.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/22 17:39:20 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:34:35 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:20:00 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/17 19:22:08 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+#include <stdio.h>
 
-int	ft_strlen(const char *str)
+size_t	ft_strlen(const char *s)
 {
-	int	s;
+	size_t	i;
 
-	s = 0;
-	while (str[s] != '\0')
-		s++;
-	return (s);
+	i = 0;
+	while (s[i])
+		i++;
+	return (i);
 }
-/*
-int main (int argc, char **argv)
+
+/*int	main(void)
 {
-	// ft_strlen: Calcula o tamanho de um str.
-	if (argv < 2)
-		printf("ft_strlen(%s): %i\n",argv[1], ft_strlen(argv[1]));
-	return (0);
-}
-*/
+	char *s = "Hello !";
+	char *s1 = "1";
+	char *s2 = "lorem\tipsum\tdolor\nsit\namet\n";
+	char *s3 = "";
+	char *s4 = "\n\n\f\r\t  ";
+
+	printf("7  Len of %s -> %zu\n", s, ft_strlen(s));
+	printf("1  Len of %s -> %zu\n", s, ft_strlen(s1));
+	printf("27 Len of %s -> %zu\n", s, ft_strlen(s2));
+	printf("0  Len of %s -> %zu\n", s, ft_strlen(s3));
+	printf("7  Len of %s -> %zu\n", s, ft_strlen(s4));
+}*/

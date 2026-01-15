@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strmapi.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/10 16:36:31 by codespace         #+#    #+#             */
-/*   Updated: 2024/11/10 21:35:15 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:02:48 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/10 14:24:44 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,41 +14,22 @@
 
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 {
-	char			*str;
-	unsigned int	i;
-	unsigned int	len;
+	char	*result;
+	size_t	len;
+	size_t	i;
 
 	if (!s || !f)
-		return (ft_strdup(""));
-	i = 0;
-	len = ft_strlen(s);
-	str = (char *)malloc(sizeof(char) * (len + 1));
-	if (!str)
 		return (NULL);
+	len = ft_strlen(s);
+	result = (char *)malloc(sizeof(char) * (len + 1));
+	if (!result)
+		return (NULL);
+	i = 0;
 	while (i < len)
 	{
-		str[i] = f(i, s[i]);
+		result[i] = f(i, s[i]);
 		i++;
 	}
-	str[i] = '\0';
-	return (str);
+	result[len] = '\0';
+	return (result);
 }
-/*
-char	ft_toupper_test(unsigned int i, char c)
-{
-	i = 0;
-	if (c >= 'a' && c <= 'z')
-		return (c - 32);
-	return (c);
-}
-
-int	main(int argc, char **argv)
-{
-	// ft_strmapi: Aplica uma funcao em cada char de uma string.
-	if (argc == 2)
-	{
-		printf("%s\n", ft_strmapi(argv[1], ft_toupper_test));
-	}
-	return (0);
-}
-*/

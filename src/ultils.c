@@ -1,13 +1,41 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ultils.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/12 18:24:50 by dedantas          #+#    #+#             */
+/*   Updated: 2026/01/15 01:59:59 by dedantas         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
-int	ft_strcmp(const char *s1, const char *s2)
+void	free_env(char **env)
 {
-	size_t i;
+	int	i;
 
+	if (!env)
+		return ;
 	i = 0;
-	while(s1[i] && s2[i] && s1[i] == s2[i])
+	while (env[i])
+	{
+		free(env[i]);
 		i++;
-	return (s1[i] - s2[i]);
+	}
+	free(env);
+}
+
+void	skip_whitespace(char **line)
+{
+	while (**line && ft_isspace(**line))
+		(*line)++;
+}
+
+int	is_operator(char c)
+{
+	return (c == '|' || c == '<' || c == '>');
 }
 
 static void	free_arr(char **arr)
@@ -33,37 +61,10 @@ char	**ft_envdup(char **arr)
 		return (NULL);
 	new[i] = NULL;
 	while (i-- > 0)
-		if (!(new[i] = ft_strdup(arr[i])))
+	{
+		new[i] = ft_strdup(arr[i]);
+		if (!new[i])
 			return (free_arr(new), NULL);
+	}
 	return (new);
-}
-
-void	free_shell(t_shell *shell)
-{
-	int	i;
-	t_token	*tmp;
-
-	if (shell->line)
-	{
-		free(shell->line);
-		shell->line = NULL;
-	}
-	while (shell->tokens)
-	{
-		tmp = shell->tokens;
-		shell->tokens = shell->tokens->next;
-		free(tmp->value);
-		free(tmp);
-	}
-	if (shell->env)
-	{
-		i = 0;
-		while (shell->env[i])
-		{
-			free(shell->env[i]);
-			i++;
-		}
-		free(shell->env);
-		shell->env = NULL;
-	}
 }

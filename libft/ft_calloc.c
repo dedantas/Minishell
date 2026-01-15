@@ -3,38 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   ft_calloc.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/02 14:35:47 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:17:58 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 13:58:25 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/10 13:58:32 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	*ft_calloc(size_t nmemb, size_t size)
+void	*ft_calloc(size_t count, size_t size)
 {
-	size_t	total_size;
 	void	*ptr;
 
-	if ((nmemb != 0) && (size > SIZE_MAX / nmemb))
+	if (size != 0 && count > SIZE_MAX / size)
 		return (NULL);
-	total_size = nmemb * size;
-	ptr = malloc(total_size);
+	ptr = malloc(count * size);
 	if (!ptr)
 		return (NULL);
-	ft_memset(ptr, 0, total_size);
+	ft_bzero(ptr, count * size);
 	return (ptr);
 }
-/*
-int main(int argc, char **argv)
-{
-	// calloc: Aloca memoria, e inicia todos dos bytes com zero.
-	if (argc == 3)
-	{
-		printf("ft_calloc: %s\n", ft_calloc(atoi(argv[1]), atoi(argv[2])));
-		printf("calloc: %s\n", calloc(atoi(argv[1]), atoi(argv[2])));
-	}
-	return (0);
-}
-*/

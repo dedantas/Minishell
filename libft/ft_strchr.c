@@ -3,39 +3,49 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/25 20:55:49 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:29:19 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:18:03 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/18 13:03:34 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+//#include <stdio.h>
+//#include <string.h>
 #include "libft.h"
 
 char	*ft_strchr(const char *s, int c)
 {
-	size_t			i;
-	unsigned char	vc;
-
-	vc = (unsigned char)c;
-	i = 0;
-	while (s[i] != '\0')
+	while (*s != '\0')
 	{
-		if (s[i] == vc)
-			return ((char *)&s[i]);
-		i++;
+		if (*s == (char)c)
+			return ((char *)s);
+		s++;
 	}
-	if (vc == '\0')
-		return ((char *)&s[i]);
+	if ((char)c == '\0')
+		return ((char *)s);
 	return (NULL);
 }
+
 /*
-int main(int argc, char **argv)
+int	main(void)
 {
-	// ft_strchr: Busca a primeira ocorrencia de um char em uma str.
-	if (argv < 2)
-		return (1);
-	printf("ft_strchr(%s): %s\n", argv[1], ft_strchr(argv[1], argv[1][0]));
-	return (0);
+	char	*s = "Bonjour";
+
+	printf("%p\n", strchr(s, 'b'));
+	printf("my func-> %p\n\n", ft_strchr(s, 'b'));
+
+	printf("%p\n", strchr(s, 'j'));
+	printf("%p\n\n", ft_strchr(s, 'j'));
+
+	printf("%p\n", strchr(s, 's'));
+	printf("%p\n\n", ft_strchr(s, 's'));
+
+	printf("%p\n", strchr(s, '\0'));
+	printf("%p\n\n", ft_strchr(s, '\0'));
+
+	char	*s1 = "";
+	printf("%p\n", strchr(s1, '\0'));
+	printf("%p\n\n", ft_strchr(s1, '\0'));
 }
 */

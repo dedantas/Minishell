@@ -1,86 +1,122 @@
-#ifndef MINISHEL_H
-# define MINISHEL_H
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/15 02:43:18 by dedantas          #+#    #+#             */
+/*   Updated: 2026/01/15 03:32:19 by dedantas         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include <stdio.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-#include "libft/libft.h"
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
-#include <sys/wait.h>
-#include <limits.h>
+#ifndef MINISHELL_H
+# define MINISHELL_H
+
+# include <stdio.h>
+# include <readline/readline.h>
+# include <readline/history.h>
+# include "libft/libft.h"
+# include <stdlib.h>
+# include <unistd.h>
+# include <signal.h>
+# include <sys/wait.h>
+# include <limits.h>
 
 typedef enum e_type // enum para saber o tipo de token
 {
 	WORD,
-	PIPE,	 // |
-	IN,	 	 // <
-	OUT,	 // >
-	APPEND,	 // >>
-	HEREDOC, // <<
-	DOLLAR,  // $
-} t_type;
+	PIPE,	// |
+	IN,	// <
+	OUT,	// >
+	APPEND,	// >>
+	HEREDOC,// <<
+}	t_type;
+
+typedef enum e_quote
+{
+	NO,
+	SINGLE,
+	DOUBLE,
+}	t_quote;
 
 typedef struct s_token // lista de tokens
 {
 	t_type		type;
 	char		*value;
-	struct s_token	*next;
-} t_token;
+	t_quote		quote;
+	struct s_token					*next;
+}	t_token;
+
+typedef struct s_redir // lista de redirecionamento
+{
+	t_type		type;
+	char		*file;
+	int			heredoc_fd;
+	int			expand;
+	struct s_redir	*next;
+}	t_redir;
 
 typedef struct s_cmd // lista de comandos
 {
 	char		**args;
-	int		infile;
-	int		outfile;
+	t_quote		*arg_quote;
+	t_redir		*redirs;
 	struct s_cmd	*next;
-} t_cmd;
+}	t_cmd;
 
 typedef struct s_shell
 {
 	char	**env; // copia para manipulação
 	char	*line; // linha de comando
-	t_token *tokens;
+	t_token	*tokens;
 	t_cmd	*cmds;
-} t_shell;
+}	t_shell;
 
 char	**ft_envdup(char **arr);
-void	free_shell(t_shell *shell);
-/*int	exec_buitins(t_shell *shell);
-int	mini_env(char **env);
-int	mini_pwd(void);
-int	mini_echo(char **cmd);
-int	mini_exit(t_shell *shell);
-int	mini_cd(char **args, t_shell *shell);
-int	mini_unset(t_shell *shell, char **args);
-int	mini_export(t_shell *shell, char **args);
-int	mini_env2(char **envp);
-char	*ft_strjoin3(const char *s1, const char *s2, const char *s3);
-void	add_env_var(t_shell *shell, const char *name, const char *value);
-void	up_env_var(t_shell *shell, const char *str, int eq);
-void	export_error(char *arg);*/
 
 // ultils
-int	ft_strcmp(const char *s1, const char *s2);
-
+int		is_operator(char c);
+void	skip_whitespace(char **line);
+// Lexer
 t_token	*lexer(char *line);
-int mini_pwd(t_shell *shell);               // pode precisar de env no futuro, por agora vazio
-int mini_env(t_shell *shell);               // usa shell->env
-int mini_echo(t_cmd *cmd);                  // só usa cmd->args
-int mini_exit(t_cmd *cmd, t_shell *shell);  // precisa de args e free
-int mini_cd(t_cmd *cmd, t_shell *shell);
-int mini_export(t_cmd *cmd, t_shell *shell);
-int mini_unset(t_cmd *cmd, t_shell *shell);
+// Parser
+t_cmd	*parser(t_token *tokens);
+int		heredoc_handle(t_shell *shell);
+// Expanded
+int		expand(t_shell *shell);
+char	*expand_word(t_shell *shell, char *str);
+// Buitins
+int		mini_pwd(t_shell *shell);
+int		mini_env(t_shell *shell);
+int		mini_echo(t_cmd *cmd);
+int		mini_exit(t_cmd *cmd, t_shell *shell);
+int		mini_cd(t_cmd *cmd, t_shell *shell);
+int		mini_export(t_cmd *cmd, t_shell *shell);
+int		mini_unset(t_cmd *cmd, t_shell *shell);
 
-// Funções auxiliares (adiciona os protótipos para evitar implicit declaration)
-int mini_env2(char **env);
-void up_env_var(t_shell *shell, const char *str, int eq);
-void export_error(char *arg);
+int		mini_env2(char **env);
+void	up_env_var(t_shell *shell, const char *str, int eq);
+void	export_error(char *arg);
+char	*ft_getenv(char **env, const char *name);
+int	check_cd_args(t_cmd *cmd);
+void	unset_var(t_shell *shell, const char *name);
+
+// New _ add
+t_token	*new_token(t_type type, char *value, t_quote quote);
+void	add_token(t_token **tokens, t_token *new);
+t_cmd	*new_cmd(void);
+void	add_cmd(t_cmd **cmds, t_cmd *new);
+void	add_arg(t_cmd *cmd, char *value, t_quote quote);
 
 // Executor e helpers
-int executor(t_shell *shell);
-int is_builtin(char *cmd_name);
-int exec_builtin(t_cmd *cmd, t_shell *shell);
+int		executor(t_shell *shell);
+int		is_builtin(char *cmd_name);
+int		exec_builtin(t_cmd *cmd, t_shell *shell);
+// Free
+void	free_shell(t_shell *shell);
+void	free_tokens(t_token *tokens);
+void	free_cmds(t_cmd *cmds);
+void	free_env(char **env);
 
 #endif
