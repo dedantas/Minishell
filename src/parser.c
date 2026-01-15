@@ -21,12 +21,8 @@ void	add_redir(t_cmd *cmd, t_type type, char *file, int expand)
 	redir->type = type;
 	redir->file = ft_strdup(file);
 	redir->heredoc_fd = -1;
-<<<<<<< HEAD
 	redir->expand = expand;
 	redir->next = NULL;
-=======
-	redir->next= NULL;
->>>>>>> e4168d3bb3618b37a230190b7a6426e7f433554b
 	if (!cmd->redirs)
 		cmd->redirs = redir;
 	else
@@ -84,7 +80,6 @@ t_cmd	*parser(t_token *tokens)
 			add_cmd(&cmds, current);
 		}
 		if (tokens->type == WORD)
-<<<<<<< HEAD
 			add_arg(current, tokens->value, tokens->quote);
 		else if (is_redir(tokens->type)
 			&& !handle_redir(current, &tokens))
@@ -96,25 +91,5 @@ t_cmd	*parser(t_token *tokens)
 	}
 	if (current && !current->args)
 		return (printf("syntax error near unexpected token `newline'"), NULL);
-=======
-			add_arg(current, tokens->value);
-		else if (is_redir(tokens->type))
-		{
-			if (!tokens->next || tokens->next->type != WORD)
-				return (printf("syntax error\n"), NULL);
-			add_redir(current, tokens->type, tokens->next->value);
-			tokens = tokens->next;
-		}
-		else if (tokens->type == PIPE)
-		{
-			if (!current->args || !tokens->next)
-				return (printf("syntax error near |\n"), NULL);
-			current = NULL;
-		}
-		tokens = tokens->next;
-	}
-	if (current && !current->args)
-		return (printf("syntax error near unexpected token `newline'\n"), NULL);
->>>>>>> e4168d3bb3618b37a230190b7a6426e7f433554b
 	return (cmds);
 }
