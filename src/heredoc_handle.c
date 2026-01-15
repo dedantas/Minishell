@@ -32,12 +32,8 @@ static int child_exit_code(void)
 }*/
 
 // filho lê o heredoc
-<<<<<<< HEAD
 
 static int	heredoc_stop(char *line, char *delimiter)
-=======
-static int child_heredoc(int pipe_fd[2], char *delimiter)
->>>>>>> e4168d3bb3618b37a230190b7a6426e7f433554b
 {
 	if (!line)
 		return (1);
@@ -90,11 +86,7 @@ static int	parent_heredoc(int pipe_fd[2], pid_t pid)
 }
 
 // função principal
-<<<<<<< HEAD
 int	heredoc_read(t_shell *shell, char *delimiter, int expand)
-=======
-int heredoc_read(char *delimiter)
->>>>>>> e4168d3bb3618b37a230190b7a6426e7f433554b
 {
 	pid_t	pid;
 	int		pipe_fd[2];
@@ -109,11 +101,7 @@ int heredoc_read(char *delimiter)
 		return (-1);
 	}
 	if (pid == 0)
-<<<<<<< HEAD
 		exit(child_heredoc(pipe_fd, delimiter, expand, shell));
-=======
-		exit(child_heredoc(pipe_fd, delimiter));
->>>>>>> e4168d3bb3618b37a230190b7a6426e7f433554b
 	else
 		return (parent_heredoc(pipe_fd, pid));
 }
@@ -131,12 +119,8 @@ int	heredoc_handle(t_shell *shell)
 		{
 			if (redir->type == HEREDOC)
 			{
-<<<<<<< HEAD
 				redir->heredoc_fd = heredoc_read(shell, redir->file,
 						redir->expand);
-=======
-				redir->heredoc_fd = heredoc_read(redir->file);
->>>>>>> e4168d3bb3618b37a230190b7a6426e7f433554b
 				if (redir->heredoc_fd == -1)
 					return (1);
 			}
