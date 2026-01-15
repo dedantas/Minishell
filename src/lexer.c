@@ -81,6 +81,7 @@ t_token	*lexer(char *line)
 			break ;
 		if (*line == '\'')
 		{
+<<<<<<< HEAD
 			value = read_quote(&line, '\'');
 			add_token(&tokens, new_token(WORD, value, SINGLE));
 			free(value);
@@ -92,6 +93,48 @@ t_token	*lexer(char *line)
 			add_token(&tokens, new_token(WORD, value, DOUBLE));
 			free(value);
 			continue ;
+=======
+			value = read_single_quote(&line);
+			add_token(&tokens, new_token(WORD, value));
+			free(value);
+		}
+		else if (*line == '"')
+		{
+			value = read_double_quote(&line);
+			add_token(&tokens, new_token(WORD, value));
+			free(value);
+		}
+		else if (*line == '|')
+		{
+			add_token(&tokens, new_token(PIPE, "|"));
+			line++;
+		}
+		else if (*line == '<' && *(line + 1) == '<')
+		{
+			add_token(&tokens, new_token(HEREDOC, "<<"));
+			line += 2;
+		}
+		else if (*line == '>' && *(line + 1) == '>')
+		{
+			add_token(&tokens, new_token(APPEND, ">>"));
+			line += 2;
+		}
+		else if (*line == '<')
+		{
+			add_token(&tokens, new_token(IN, "<"));
+			line++;
+		}
+		else if (*line == '>')
+		{
+			add_token(&tokens, new_token(OUT, ">"));
+			line++;
+		}
+		else
+		{
+			value = read_word(&line);
+			add_token(&tokens, new_token(WORD, value));
+			free(value);
+>>>>>>> e4168d3bb3618b37a230190b7a6426e7f433554b
 		}
 		else if (handle_operators(&tokens, &line))
 			continue ;
