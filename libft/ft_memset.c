@@ -3,39 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   ft_memset.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/22 19:22:49 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:24:51 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:14:21 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/10 15:58:09 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	*ft_memset(void *s, int c, size_t n)
+void	*ft_memset(void *b, int c, size_t len)
 {
-	size_t			i;
-	unsigned char	*ptr;
+	unsigned char	*p;
 
-	ptr = (unsigned char *)s;
-	i = 0;
-	while (i < n)
-	{
-		ptr[i] = (unsigned char)c;
-		i++;
-	}
-	return (s);
+	p = (unsigned char *) b;
+	while (len--)
+		*p++ = (unsigned char)c;
+	return (b);
 }
-/*
-int main(int argc, char **argv)
-{
-	// Preenche uma area com um valor especifico.
-	char buffer[10];
-	if (argc < 2)
-		return (1);
-	ft_memset(buffer, argv[1][0], sizeof(buffer) - 1);
-	buffer[sizeof(buffer) - 1] = '\0';
-	printf("ft_memset(%c): %s\n", argv[1][0], buffer);
-	return (0);
-}
-*/

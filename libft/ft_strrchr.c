@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strrchr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/10 20:11:13 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 20:30:40 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:18:42 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/17 12:54:42 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,28 +14,22 @@
 
 char	*ft_strrchr(const char *s, int c)
 {
-	size_t	i;
-	char	*last;
+	unsigned char	buscado;
+	const char		*ultima;
 
-	i = 0;
-	last = NULL;
-	while (s[i])
+	ultima = NULL;
+	buscado = (unsigned char)c;
+	while (1)
 	{
-		if (s[i] == (char)c)
-			last = (char *)&s[i];
-		i++;
+		if (*s == buscado)
+		{
+			ultima = s;
+		}
+		if (*s == '\0')
+		{
+			break ;
+		}
+		s++;
 	}
-	if ((char)c == '\0')
-		return ((char *)&s[i]);
-	return (last);
+	return ((char *)ultima);
 }
-/*
-int	main(int argc, char **argv)
-{
-	// strrchr: Recebe uma "*s" e um int "c",
-		e retorna o endereco do ultimo valor encontrado de "c" dentro de "*s";
-	if (argc == 2)
-		printf("ft_strrchr: %s", ft_strrchr(argv[1], 'c'));
-	return (0);
-}
-*/

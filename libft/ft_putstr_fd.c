@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_putstr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/10 19:08:31 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:27:23 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 16:05:11 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/10 17:59:43 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,9 @@
 
 void	ft_putstr_fd(char *s, int fd)
 {
-	int	i;
-
-	i = 0;
-	while (s[i])
+	if (s)
 	{
-		ft_putchar_fd(s[i], fd);
-		i++;
+		while (*s)
+			write(fd, s++, 1);
 	}
 }
-/*
-int	main(int argc, char **argv)
-{
-	// ft_putstr_fd: Escreve uma string em um arquivo ou fluxo.
-	char	*str;
-
-	ft_putstr_fd(argv[1], 1);
-	return (0);
-}
-*/

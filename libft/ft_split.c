@@ -3,129 +3,100 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/05 21:30:56 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 22:18:56 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:21:08 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/27 15:33:50 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static void	ft_freeup(char **strs, int i)
+static int	count_words(char const *s, char c)
 {
-	while (i >= 0)
-	{
-		free(strs[i]);
-		i--;
-	}
-	free(strs);
-}
+	int	count;
+	int	in_word;
 
-static int	ft_wordcount(const char *str, char c)
-{
-	int	i;
-	int	word;
-
-	i = 0;
-	word = 0;
-	while (str[i] != '\0')
+	count = 0;
+	in_word = 0;
+	while (*s)
 	{
-		if (str[i] != c)
+		if (*s != c && !in_word)
 		{
-			word++;
-			while (str[i] != c && str[i] != '\0')
-				i++;
+			in_word = 1;
+			count++;
 		}
-		else
-			i++;
+		else if (*s == c)
+			in_word = 0;
+		s++;
 	}
-	return (word);
+	return (count);
 }
 
-static void	ft_strcpy(char *word, const char *str, char c, int j)
+static char	*get_next_word(char const **s, char c)
 {
-	int	i;
+	char const	*start;
+	char		*word;
+	size_t		len;
 
-	i = 0;
-	while (str[j] != '\0' && str[j] == c)
-		j++;
-	while (str[j + i] != c && str[j + i] != '\0')
-	{
-		word[i] = str[j + i];
-		i++;
-	}
-	word[i] = '\0';
-}
-
-static char	*ft_stralloc(const char *str, char c, int *k)
-{
-	char	*word;
-	int		j;
-	int		len;
-
-	while (str[*k] != '\0' && str[*k] == c)
-		(*k)++;
-	j = *k;
-	len = 0;
-	while (str[*k] != '\0' && str[*k] != c)
-	{
-		(*k)++;
-		len++;
-	}
-	if (len == 0)
-		return (NULL);
-	word = (char *)malloc(sizeof(char) * (len + 1));
+	while (**s == c)
+		(*s)++;
+	start = *s;
+	while (**s && **s != c)
+		(*s)++;
+	len = *s - start;
+	word = malloc(len + 1);
 	if (!word)
 		return (NULL);
-	ft_strcpy(word, str, c, j);
+	ft_memcpy(word, start, len);
+	word[len] = '\0';
 	return (word);
 }
 
-char	**ft_split(const char *str, char c)
+static void	free_all(char **result, int words_allocated)
 {
-	char	**strs;
-	int		i;
-	int		j;
-	int		pos;
+	while (words_allocated--)
+		free(result[words_allocated]);
+	free(result);
+}
 
-	if (str == NULL)
+char	**ft_split(char const *s, char c)
+{
+	char	**result;
+	int		word_count;
+	int		i;
+
+	if (!s)
+		return (NULL);
+	word_count = count_words(s, c);
+	result = malloc((word_count + 1) * sizeof(char *));
+	if (!result)
 		return (NULL);
 	i = 0;
-	pos = 0;
-	j = ft_wordcount(str, c);
-	strs = (char **)malloc(sizeof(char *) * (j + 1));
-	if (strs == NULL)
-		return (NULL);
-	strs[j] = NULL;
-	while (i < j)
+	while (i < word_count)
 	{
-		strs[i] = ft_stralloc(str, c, &pos);
-		if (strs[i] == NULL)
+		result[i] = get_next_word(&s, c);
+		if (!result[i])
 		{
-			ft_freeup(strs, i - 1);
+			free_all(result, i);
 			return (NULL);
 		}
 		i++;
 	}
-	return (strs);
+	result[word_count] = NULL;
+	return (result);
 }
 
-/*
-int	main(int argc, char **argv)
+/*int main(void)
 {
-	char	**strs;
-	int		i;
+    char **words = ft_split("ola,mundo,42", ',');
 
-	// ft_split: Recebe um string e divide ela em outras arrays
-	// levando em consideracao o separador fornecido.
-	strs = ft_split("Hello, World!", ' ');
-	i = 0;
-	while (strs[i] != NULL)
-	{
-		printf("ft_split(%s): %s\n", "Hello, World!", strs[i]);
-		i++;
-	}
-	return (0);
-}
-*/
+    if (words)
+    {
+        for (int i = 0; words[i]; i++)
+            printf("%s\n", words[i]);
+        free_all(words, 3); // Libera as 3 palavras
+    }
+
+    return 0;
+}*/

@@ -6,60 +6,13 @@
 /*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 18:46:16 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/12 18:49:16 by dedantas         ###   ########.fr       */
+/*   Updated: 2026/01/15 18:58:22 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-t_cmd	*new_cmd(void)
-{
-	t_cmd	*cmd;
-
-	cmd = malloc(sizeof(t_cmd));
-	if (!cmd)
-		return (NULL);
-	cmd->args = NULL;
-	cmd->redirs = NULL;
-	cmd->next = NULL;
-	return (cmd);
-}
-
-void	add_cmd(t_cmd **cmds, t_cmd *new)
-{
-	t_cmd	*tmp;
-
-	if (!*cmds)
-		*cmds = new;
-	else
-	{
-		tmp = *cmds;
-		while (tmp->next)
-			tmp = tmp->next;
-		tmp->next = new;
-	}
-}
-
-void	add_arg(t_cmd *cmd, char *value)
-{
-	int		i;
-	int		j;
-	char	**new;
-
-	i = 0;
-	while (cmd->args && cmd->args[i])
-		i++;
-	new = malloc(sizeof(char *) * (i + 2));
-	j = -1;
-	while (++j < i)
-		new[j] = cmd->args[j];
-	new[i] = ft_strdup(value);
-	new[i + 1] = NULL;
-	free(cmd->args);
-	cmd->args = new;
-}
-
-void	add_redir(t_cmd *cmd, t_type type, char *file)
+void	add_redir(t_cmd *cmd, t_type type, char *file, int expand)
 {
 	t_redir	*redir;
 	t_redir	*tmp;
@@ -67,7 +20,9 @@ void	add_redir(t_cmd *cmd, t_type type, char *file)
 	redir = malloc(sizeof(t_redir));
 	redir->type = type;
 	redir->file = ft_strdup(file);
-	redir->next= NULL;
+	redir->heredoc_fd = -1;
+	redir->expand = expand;
+	redir->next = NULL;
 	if (!cmd->redirs)
 		cmd->redirs = redir;
 	else
@@ -79,19 +34,44 @@ void	add_redir(t_cmd *cmd, t_type type, char *file)
 	}
 }
 
-int is_redir(t_type type)
+int	is_redir(t_type type)
 {
-    return (type == IN || type == OUT
-        || type == APPEND || type == HEREDOC);
+	return (type == IN || type == OUT
+		|| type == APPEND || type == HEREDOC);
 }
 
-t_cmd *parser(t_token *tokens)
+static int	handle_redir(t_cmd *current, t_token **tokens)
 {
-	t_cmd   *cmds = NULL;
-	t_cmd   *current = NULL;
+	int	do_expand;
+
+	if (!(*tokens)->next || (*tokens)->next->type != WORD)
+		return (0);
+	do_expand = 1;
+	if ((*tokens)->type == HEREDOC)
+		do_expand = ((*tokens)->next->quote == NO);
+	add_redir(current, (*tokens)->type,
+		(*tokens)->next->value, do_expand);
+	*tokens = (*tokens)->next;
+	return (1);
+}
+
+static int	handle_pipe(t_cmd **current, t_token *tokens)
+{
+	if (!(*current)->args || !tokens->next)
+		return (0);
+	*current = NULL;
+	return (1);
+}
+
+t_cmd	*parser(t_token *tokens)
+{
+	t_cmd	*cmds;
+	t_cmd	*current;
 
 	if (!tokens)
-		return NULL;
+		return (NULL);
+	cmds = NULL;
+	current = NULL;
 	while (tokens)
 	{
 		if (!current)
@@ -100,21 +80,16 @@ t_cmd *parser(t_token *tokens)
 			add_cmd(&cmds, current);
 		}
 		if (tokens->type == WORD)
-			add_arg(current, tokens->value);
-		else if (is_redir(tokens->type))
-		{
-			if (!tokens->next || tokens->next->type != WORD)
-				return (printf("syntax error\n"), NULL);
-			add_redir(current, tokens->type, tokens->next->value);
-			tokens = tokens->next;
-		}
-		else if (tokens->type == PIPE)
-		{
-			if (!current->args || !tokens->next || tokens->next->type == PIPE)
-				return (printf("syntax error near |\n"), NULL);
-			current = NULL;
-		}
+			add_arg(current, tokens->value, tokens->quote);
+		else if (is_redir(tokens->type)
+			&& !handle_redir(current, &tokens))
+			return (printf("syntax error"), NULL);
+		else if (tokens->type == PIPE
+			&& !handle_pipe(&current, tokens))
+			return (printf("syntax error near |"), NULL);
 		tokens = tokens->next;
 	}
+	if (current && !current->args)
+		return (printf("syntax error near unexpected token `newline'"), NULL);
 	return (cmds);
 }

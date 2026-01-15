@@ -3,43 +3,44 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strlcpy.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/24 22:17:55 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:34:18 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:05:31 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/17 19:25:46 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-size_t	ft_strlcpy(char *dest, const char *src, size_t size)
+size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 {
-	size_t	i;
+	size_t		srclen;
+	size_t		i;
 
-	if (!size)
-		return (ft_strlen(src));
 	i = 0;
-	while (src[i] && (i < size - 1))
+	srclen = ft_strlen(src);
+	if (dstsize == 0)
+		return (srclen);
+	while (i < (dstsize - 1) && src[i] != '\0')
 	{
-		dest[i] = src[i];
+		dst[i] = src[i];
 		i++;
 	}
-	dest[i] = '\0';
-	return (ft_strlen(src));
+	dst[i] = '\0';
+	return (srclen);
 }
-/*
-int main(int argc, char **argv)
-{
-	// ft_strlcpy: Copia uma string levando em consideracao o tamanho da len.
-	char src[] = "Hello, World!";
-	char dest[20];
-	size_t size = 16;
 
-	ft_strlcpy(dest, src, size);
-	if (!size)
-		printf("ft_strlcpy: %zu\n", ft_strlcpy(dest, src, size));
-	else
-		printf("ft_strlcpy(%s): %s\n", src, dest);
-	return (0);
-}
-*/
+/*#include <stdio.h>
+
+int main() {
+    char src[] = "Hello, world!";
+    char dst[20]; // Destino com espaço suficiente para copiar
+
+    size_t copied = ft_strlcpy(dst, src, sizeof(dst));
+
+    printf("Fonte: %s\n", src);
+    printf("Destino: %s\n", dst);
+    printf("Tamanho da fonte: %zu\n", copied);
+
+    return 0;
+}*/

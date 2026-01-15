@@ -3,42 +3,45 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strdup.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/02 15:10:21 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:29:59 by vilopes          ###   ########.fr       */
+/*   Created: 2025/02/05 10:10:33 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/17 19:24:33 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+#include <stdio.h>
 
-char	*ft_strdup(const char *s)
+char	*ft_strdup(const char *src)
 {
-	char	*mem;
-	size_t	len;
-	size_t	i;
+	char	*str;
+	int		buf_size;
 
-	len = ft_strlen(s) + 1;
-	mem = (char *)malloc(len * sizeof(char));
-	if (mem == NULL)
+	buf_size = ft_strlen(src) + 1;
+	str = malloc(buf_size);
+	if (NULL == str)
 		return (NULL);
-	i = 0;
-	while (i < len)
-	{
-		mem[i] = s[i];
-		i++;
-	}
-	return (mem);
+	ft_strlcpy(str, src, buf_size);
+	return (str);
 }
-/*
-int main(int argc, char **argv)
+
+/*int main() 
 {
-	// ft_strdup: Cria uma copia de uma string
-	if (argc == 2)
-	{
-		printf("Original string: %s\n", argv[1]);
-		printf("Duplicated string: %s\n", ft_strdup(argv[1]));
-	}
-	return (0);
-}
-*/
+    const char *original = "Olá, Mundo!";
+   
+    // Chama a função ft_strdup
+    char *copia = ft_strdup(original);
+    
+    if (copia != NULL) {
+        printf("String original: %s\n", original);
+        printf("Cópia da string: %s\n", copia);
+        
+        // Lembre-se de liberar a memória alocada
+        free(copia);
+    } else {
+        printf("Erro na alocação de memória!\n");
+    }
+
+    return 0;
+}*/

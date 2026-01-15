@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_tolower.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/25 20:50:13 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:56:05 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:02:23 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/10 14:02:26 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,7 @@
 
 int	ft_tolower(int c)
 {
-	if (!(c >= 'A' && c <= 'Z'))
-		return (c);
-	c = c + 32;
+	if (c >= 65 && c <= 90)
+		return (c + 32);
 	return (c);
 }
-/*
-int main(int argc, char **argv)
-{
-	// ft_tolower: Converte char minusculo.
-	if (argc < 2)
-		return (1);
-	printf("ft_tolower(%c): %c\n", argv[1][0], ft_tolower(argv[1][0]));
-	return (0);
-}
-*/

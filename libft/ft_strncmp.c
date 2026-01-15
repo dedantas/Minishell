@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strncmp.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/31 18:24:24 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:36:06 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 13:58:55 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/10 13:59:03 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,35 +14,12 @@
 
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
-	size_t			i;
-	unsigned char	*ptr1;
-	unsigned char	*ptr2;
-
-	ptr1 = (unsigned char *)s1;
-	ptr2 = (unsigned char *)s2;
-	i = 0;
-	while (i < n)
+	if (!n)
+		return (0);
+	while (*s1 == *s2 && --n && *s1)
 	{
-		if (ptr1[i] != ptr2[i])
-			return (ptr1[i] - ptr2[i]);
-		if (ptr1[i] == '\0')
-			return (0);
-		i++;
+		++s1;
+		++s2;
 	}
-	return (0);
+	return (*(unsigned char *)s1 - *(unsigned char *)s2);
 }
-/*
-int main(int argc, char **argv)
-{
-	// ft_strncmp: Compra duas strings e retorna a diferanca
-	// levando em consideracao o tamanho de "n".
-	if (argc == 4)
-	{
-		printf("Original string: %s\n", argv[1]);
-		printf("String to compare: %s\n", argv[2]);
-		printf("Number of characters to compare: %s\n", argv[3]);
-		printf("Result: %d\n", ft_strncmp(argv[1], argv[2], atoi(argv[3])));
-	}
-	return (0);
-}
-*/

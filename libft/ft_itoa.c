@@ -3,79 +3,52 @@
 /*                                                        :::      ::::::::   */
 /*   ft_itoa.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/31 21:19:46 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:21:15 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:22:03 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/10 14:22:05 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static int	ft_get_size(int n)
+static int	get_num_len(int n)
 {
-	int	size;
+	int	len;
 
-	size = 0;
-	if (n <= 0)
-		size++;
-	while (n != 0)
+	len = 1;
+	if (n < 0)
+		len++;
+	while (n / 10 != 0)
 	{
-		n = n / 10;
-		size++;
+		len++;
+		n /= 10;
 	}
-	return (size);
-}
-
-static void	ft_fill_res(int size, int offset, int n, char *res)
-{
-	while (size > offset)
-	{
-		res[size - 1] = n % 10 + '0';
-		n = n / 10;
-		size--;
-	}
+	return (len);
 }
 
 char	*ft_itoa(int n)
 {
-	int		offset;
-	int		size;
-	char	*res;
+	char	*str;
+	int		len;
+	int		is_neg;
+	long	num;
 
-	offset = 0;
-	size = ft_get_size(n);
-	res = (char *)malloc(sizeof(char) * size + 1);
-	if (!res)
-		return (0);
-	if (n == -2147483648)
+	num = n;
+	len = get_num_len(num);
+	is_neg = (num < 0);
+	if (is_neg)
+		num = -num;
+	str = (char *)malloc(len + 1);
+	if (!str)
+		return (NULL);
+	str[len] = '\0';
+	while (len-- > is_neg)
 	{
-		res[0] = '-';
-		res[1] = '2';
-		n = 147483648;
-		offset = 2;
+		str[len] = (num % 10) + '0';
+		num /= 10;
 	}
-	if (n < 0)
-	{
-		res[0] = '-';
-		offset = 1;
-		n = -n;
-	}
-	ft_fill_res(size, offset, n, res);
-	res[size] = '\0';
-	return (res);
+	if (is_neg)
+		str[0] = '-';
+	return (str);
 }
-
-/*
-int main(int argc, char **argv)
-{
-	//ft_itoa: Converte o valor int em str
-    if (argc ==2)
-    {
-        char *str = ft_itoa(ft_atoi(argv[1]));
-        printf("%s\n", str);
-        free(str);
-    }
-    return (0);
-}
-*/

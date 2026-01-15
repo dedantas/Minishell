@@ -6,100 +6,98 @@
 /*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 18:31:07 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/12 18:35:03 by dedantas         ###   ########.fr       */
+/*   Updated: 2026/01/15 19:08:42 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void print_tokens(t_token *tokens)
+void	print_tokens(t_token *t)
 {
-    int i = 0;
-    while (tokens)
-    {
-        printf("Token: %d, Value: %s\n", tokens->type, tokens->value);
-        tokens = tokens->next;
-        i++;
-    }
+	while (t)
+	{
+		printf("[TOKEN] type=%d value='%s' quote=%d\n",
+			t->type, t->value, t->quote);
+		t = t->next;
+	}
 }
 
-void print_cmds(t_cmd *cmds)
+void	print_cmds(t_cmd *cmd)
 {
-    int i;
-    int cmd_num = 0;
-    t_redir *r;
+	int		i;
+	int		n;
+	t_redir	*r;
 
-    while (cmds)
-    {
-        printf("Cmd %d:\n", cmd_num);
-        if (cmds->args)
-        {
-            i = 0;
-            while (cmds->args[i])
-	    {
-                printf("  Arg[%d]: %s\n", i, cmds->args[i]);
-		i++;
-	    }
-        }
-
-        r = cmds->redirs;
-        while (r)
-        {
-            printf("  Redir: type=%d, file=%s\n", r->type, r->file);
-            r = r->next;
-        }
-
-        cmds = cmds->next;
-        cmd_num++;
-    }
+	n = 0;
+	while (cmd)
+	{
+		printf("Cmd %d:\n", n);
+		if (cmd->args)
+		{
+			i = 0;
+			while (cmd->args[i])
+			{
+				printf(" arg[%d] = '%s' (quote=%d)\n",
+					i, cmd->args[i], cmd->arg_quote[i]);
+				i++;
+			}
+		}
+		r = cmd->redirs;
+		while (r)
+		{
+			printf(" redir type=%d file='%s' expand=%d fd=%d\n",
+				r->type, r->file, r->expand, r->heredoc_fd);
+			r = r->next;
+		}
+		cmd = cmd->next;
+		n++;
+	}
 }
 
 int	main(int ac, char **av, char **envp)
 {
+	t_shell	shell;
+
 	(void)ac;
 	(void)av;
-	t_shell	shell;
 	shell.env = ft_envdup(envp);
-
 	while (1)
 	{
-		shell.line = readline("🔹 minishell$ ");
+		shell.line = readline("🔹>>>> minishell$ ");
 		if (!shell.line)
-			break; // Ctrl+D
+			break ;
 		if (*shell.line)
 			add_history(shell.line);
-
-		// --- Lexer ---
 		shell.tokens = lexer(shell.line);
 		printf("🔹 Tokens before expansion:\n");
 		print_tokens(shell.tokens);
-
-		// --- Parser ---
 		shell.cmds = parser(shell.tokens);
 		if (!shell.cmds)
 		{
 			printf("⚠️ Parser error, skipping line\n");
 			free_shell(&shell);
-			continue;
+			continue ;
 		}
-		// --- Test Heredoc ---
 		if (heredoc_handle(&shell) != 0)
 		{
 			printf("⚠️ Heredoc error, skipping line\n");
 			free_shell(&shell);
-			continue;
+			continue ;
 		}
-
-		// --- Print parsed commands ---
+		printf("🔹 After heredoc_handle:\n");
 		print_cmds(shell.cmds);
-
-
-		// --- Cleanup ---
+		if (expand(&shell) != 0)
+		{
+			printf("⚠️ Expand error\n");
+			free_shell(&shell);
+			continue ;
+		}
+		printf("🔹 After expand:\n");
+		print_cmds(shell.cmds);
 		free_shell(&shell);
 	}
-
 	free_shell(&shell);
-	return 0;
+	return (0);
 }
 
 /*
@@ -138,7 +136,7 @@ int main(int ac, char **av, char **envp)
 
         // === Simulação manual de t_cmd (até o parsing real entregar) ===
         t_cmd fake_cmd = {0};
-        fake_cmd.args = ft_split(shell.line, ' ');  // separa por espaços (simples, mas funciona para testes)
+        fake_cmd.args = ft_split(shell.line, ' ');
         fake_cmd.infile = 0;   // stdin
         fake_cmd.outfile = 1;  // stdout
         fake_cmd.next = NULL;

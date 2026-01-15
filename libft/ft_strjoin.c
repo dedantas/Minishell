@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/05 21:26:56 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:32:37 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:20:32 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/27 15:51:50 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,38 +14,20 @@
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
-	int		i;
-	int		j;
-	char	*str;
+	char	*new_str;
+	size_t	len1;
+	size_t	len2;
 
-	i = 0;
-	j = 0;
-	str = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
-	if (str == NULL)
+	if (!s1)
+		s1 = "";
+	if (!s2)
+		s2 = "";
+	len1 = ft_strlen(s1);
+	len2 = ft_strlen(s2);
+	new_str = (char *)malloc(len1 + len2 + 1);
+	if (!new_str)
 		return (NULL);
-	while (s1[i] != '\0')
-	{
-		str[i] = s1[i];
-		i++;
-	}
-	while (s2[j] != '\0')
-	{
-		str[i + j] = s2[j];
-		j++;
-	}
-	str[i + j] = '\0';
-	return (str);
+	ft_strlcpy(new_str, s1, len1 + 1);
+	ft_strlcpy(new_str + len1, s2, len2 + 1);
+	return (new_str);
 }
-/*
-int main(int argc, char **argv)
-{
-	// ft_strjoin: Concatena duas strings, e retorna a juncao destas.
-	if (argc == 3)
-	{
-		printf("Original string: %s\n", argv[1]);
-		printf("Original string: %s\n", argv[2]);
-		printf("Joined string: %s\n", ft_strjoin(argv[1], argv[2]));
-	}
-	return (0);
-}
-*/

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_memcmp.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/31 19:59:53 by vilopes           #+#    #+#             */
-/*   Updated: 2024/11/10 21:22:58 by vilopes          ###   ########.fr       */
+/*   Created: 2025/04/10 14:01:19 by dedantas          #+#    #+#             */
+/*   Updated: 2025/04/10 14:01:28 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,30 +14,15 @@
 
 int	ft_memcmp(const void *s1, const void *s2, size_t n)
 {
-	unsigned char	*ptr1;
-	unsigned char	*ptr2;
-	size_t			i;
+	const unsigned char	*p1 = s1;
+	const unsigned char	*p2 = s2;
 
-	ptr1 = (unsigned char *)s1;
-	ptr2 = (unsigned char *)s2;
-	i = 0;
-	while (i < n)
+	while (n-- > 0)
 	{
-		if (ptr1[i] != ptr2[i])
-			return (ptr1[i] - ptr2[i]);
-		i++;
+		if (*p1 != *p2)
+			return (*p1 - *p2);
+		p1++;
+		p2++;
 	}
 	return (0);
 }
-/*
-int main(int argc, char **argv)
-{
-	// ft_memcmp: Compara dois blocos de memoria byte a byte e retorna uma
-	// diferenca entre os primeiros bytes encontrados
-	char arr1[] = {0x12, 0x34, 0x56};
-	char arr2[] = {0x12, 0x34, 0x57};
-	int result = ft_memcmp(arr1, arr2, 3);
-	printf("ft_memcmp: %d\n", result); // Deve retornar um valor negativo
-	return (0);
-}
-*/
