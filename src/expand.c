@@ -6,7 +6,7 @@
 /*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/14 19:22:04 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/17 18:10:03 by vilopes          ###   ########.fr       */
+/*   Updated: 2026/01/17 19:57:30 by vilopes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,13 +49,11 @@ static void	expand_args(t_shell *shell, t_cmd *cmd)
 	i = 0;
 	while (cmd->args && cmd->args[i])
 	{
-		printf("	[EXPAND ARG] before='%s'\n", cmd->args[i]);
 		if (cmd->arg_quote[i] != SINGLE)
 		{
 			expanded = expand_word(shell, cmd->args[i]);
 			if (expanded)
 			{
-				printf("	[EXPAND ARG] after ='%s'\n", expanded);
 				free(cmd->args[i]);
 				cmd->args[i] = expanded;
 			}
