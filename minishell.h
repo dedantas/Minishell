@@ -13,10 +13,10 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include <stdio.h>
+# include "libft/libft.h"
 # include <readline/readline.h>
 # include <readline/history.h>
-# include "libft/libft.h"
+# include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <signal.h>
@@ -27,7 +27,7 @@ typedef enum e_type // enum para saber o tipo de token
 {
 	WORD,
 	PIPE,	// |
-	IN,	// <
+	IN,		// <
 	OUT,	// >
 	APPEND,	// >>
 	HEREDOC,// <<
@@ -45,7 +45,7 @@ typedef struct s_token // lista de tokens
 	t_type		type;
 	char		*value;
 	t_quote		quote;
-	struct s_token					*next;
+	struct		s_token					*next;
 }	t_token;
 
 typedef struct s_redir // lista de redirecionamento
@@ -78,14 +78,18 @@ char	**ft_envdup(char **arr);
 // ultils
 int		is_operator(char c);
 void	skip_whitespace(char **line);
+
 // Lexer
 t_token	*lexer(char *line);
+
 // Parser
 t_cmd	*parser(t_token *tokens);
 int		heredoc_handle(t_shell *shell);
+
 // Expanded
 int		expand(t_shell *shell);
 char	*expand_word(t_shell *shell, char *str);
+
 // Buitins
 int		mini_pwd(t_shell *shell);
 int		mini_env(t_shell *shell);
@@ -94,12 +98,11 @@ int		mini_exit(t_cmd *cmd, t_shell *shell);
 int		mini_cd(t_cmd *cmd, t_shell *shell);
 int		mini_export(t_cmd *cmd, t_shell *shell);
 int		mini_unset(t_cmd *cmd, t_shell *shell);
-
 int		mini_env2(char **env);
 void	up_env_var(t_shell *shell, const char *str, int eq);
 void	export_error(char *arg);
 char	*ft_getenv(char **env, const char *name);
-int	check_cd_args(t_cmd *cmd);
+int		check_cd_args(t_cmd *cmd);
 void	unset_var(t_shell *shell, const char *name);
 
 // New _ add
@@ -113,6 +116,7 @@ void	add_arg(t_cmd *cmd, char *value, t_quote quote);
 int		executor(t_shell *shell);
 int		is_builtin(char *cmd_name);
 int		exec_builtin(t_cmd *cmd, t_shell *shell);
+
 // Free
 void	free_shell(t_shell *shell);
 void	free_tokens(t_token *tokens);
