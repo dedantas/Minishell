@@ -23,6 +23,8 @@
 # include <sys/wait.h>
 # include <limits.h>
 
+extern int g_exit_status;
+
 typedef enum e_type // enum para saber o tipo de token
 {
 	WORD,
@@ -122,5 +124,6 @@ void	free_shell(t_shell *shell);
 void	free_tokens(t_token *tokens);
 void	free_cmds(t_cmd *cmds);
 void	free_env(char **env);
+void	free_arr(char **arr);
 
 #endif

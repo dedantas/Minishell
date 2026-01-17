@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/14 19:22:04 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/14 19:26:09 by dedantas         ###   ########.fr       */
+/*   Updated: 2026/01/17 18:10:03 by vilopes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,13 @@ char	*expand_word(t_shell *shell, char *str)
 	char	*dollar;
 	char	*var;
 	char	*value;
+	int g_exit_status = 0;
 
 	dollar = ft_strchr(str, '$');
 	if (!dollar)
 		return (ft_strdup(str));
 	if (*(dollar + 1) == '?')
-		return (0);
+		return (ft_itoa(g_exit_status));
 	var = ft_strdup(dollar + 1);
 	if (!var)
 		return (NULL);
@@ -48,13 +49,13 @@ static void	expand_args(t_shell *shell, t_cmd *cmd)
 	i = 0;
 	while (cmd->args && cmd->args[i])
 	{
-		printf("[EXPAND ARG] before='%s'\n", cmd->args[i]);
+		printf("	[EXPAND ARG] before='%s'\n", cmd->args[i]);
 		if (cmd->arg_quote[i] != SINGLE)
 		{
 			expanded = expand_word(shell, cmd->args[i]);
 			if (expanded)
 			{
-				printf("[EXPAND ARG] after ='%s'\n", expanded);
+				printf("	[EXPAND ARG] after ='%s'\n", expanded);
 				free(cmd->args[i]);
 				cmd->args[i] = expanded;
 			}

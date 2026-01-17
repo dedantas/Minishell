@@ -16,7 +16,7 @@ void	print_tokens(t_token *t)
 {
 	while (t)
 	{
-		printf("[TOKEN] type=%d value='%s' quote=%d\n",
+		printf("	[TOKEN] type=%d value='%s' quote=%d\n",
 			t->type, t->value, t->quote);
 		t = t->next;
 	}
@@ -31,13 +31,13 @@ void	print_cmds(t_cmd *cmd)
 	n = 0;
 	while (cmd)
 	{
-		printf("Cmd %d:\n", n);
+		printf("	Cmd %d:\n", n);
 		if (cmd->args)
 		{
 			i = 0;
 			while (cmd->args[i])
 			{
-				printf(" arg[%d] = '%s' (quote=%d)\n",
+				printf("	arg[%d] = '%s' (quote=%d)\n",
 					i, cmd->args[i], cmd->arg_quote[i]);
 				i++;
 			}
@@ -45,7 +45,7 @@ void	print_cmds(t_cmd *cmd)
 		r = cmd->redirs;
 		while (r)
 		{
-			printf(" redir type=%d file='%s' expand=%d fd=%d\n",
+			printf("	redir type=%d file='%s' expand=%d fd=%d\n",
 				r->type, r->file, r->expand, r->heredoc_fd);
 			r = r->next;
 		}
@@ -56,44 +56,52 @@ void	print_cmds(t_cmd *cmd)
 
 int	main(int ac, char **av, char **envp)
 {
+	// FALTA CHAMAR O EXECUTOR PARA RODAR OS BUILTINS (echo, cd, cat...)
 	t_shell	shell;
 
 	(void)ac;
 	(void)av;
 	shell.env = ft_envdup(envp);
+	int g_exit_status = 0;
+	
 	while (1)
 	{
-		shell.line = readline("🔹>>>> minishell$ ");
+		shell.line = readline("🔹 minishell$ ");
 		if (!shell.line)
 			break ;
 		if (*shell.line)
 			add_history(shell.line);
 		shell.tokens = lexer(shell.line);
-		printf("🔹 Tokens before expansion:\n");
+		printf("	1.Tokens before expansion:\n");
 		print_tokens(shell.tokens);
 		shell.cmds = parser(shell.tokens);
 		if (!shell.cmds)
 		{
-			printf("⚠️ Parser error, skipping line\n");
+			printf("	⚠️ Parser error, skipping line\n");
+			g_exit_status = 2;
 			free_shell(&shell);
 			continue ;
 		}
 		if (heredoc_handle(&shell) != 0)
 		{
-			printf("⚠️ Heredoc error, skipping line\n");
+			printf("	⚠️ Heredoc error, skipping line\n");
+			g_exit_status = 1;
 			free_shell(&shell);
 			continue ;
 		}
-		printf("🔹 After heredoc_handle:\n");
+		printf("	2.After heredoc_handle:\n");
 		print_cmds(shell.cmds);
 		if (expand(&shell) != 0)
 		{
-			printf("⚠️ Expand error\n");
+			printf("	⚠️ Expand error\n");
+			g_exit_status = 1;
 			free_shell(&shell);
 			continue ;
 		}
-		printf("🔹 After expand:\n");
+		printf("	3.After expand:\n");
 		print_cmds(shell.cmds);
+		printf("\n\n");
+		g_exit_status = executor(&shell);
 		free_shell(&shell);
 	}
 	free_shell(&shell);

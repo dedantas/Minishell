@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ultils.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 18:24:50 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/15 01:59:59 by dedantas         ###   ########.fr       */
+/*   Updated: 2026/01/17 18:38:38 by vilopes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,13 +38,16 @@ int	is_operator(char c)
 	return (c == '|' || c == '<' || c == '>');
 }
 
-static void	free_arr(char **arr)
+void	free_arr(char **arr)
 {
 	int	i;
 
 	i = 0;
 	while (arr[i])
+	{
 		free(arr[i]);
+		i++;
+	}
 	free(arr);
 }
 
