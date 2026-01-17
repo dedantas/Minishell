@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/15 02:25:14 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/15 18:41:54 by dedantas         ###   ########.fr       */
+/*   Updated: 2026/01/17 19:35:37 by vilopes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ static void	free_redirs(t_redir *redirs)
 	{
 		tmp = redirs;
 		redirs = redirs->next;
+		if (tmp->heredoc_fd != -1) //evitar leaks
+			close(tmp->heredoc_fd);
 		free(tmp->file);
 		free(tmp);
 	}

@@ -118,6 +118,7 @@ void	add_arg(t_cmd *cmd, char *value, t_quote quote);
 int		executor(t_shell *shell);
 int		is_builtin(char *cmd_name);
 int		exec_builtin(t_cmd *cmd, t_shell *shell);
+int		is_state_changing(char *name);
 
 // Free
 void	free_shell(t_shell *shell);

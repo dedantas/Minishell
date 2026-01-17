@@ -6,7 +6,7 @@
 /*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/14 21:13:44 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/17 18:51:24 by vilopes          ###   ########.fr       */
+/*   Updated: 2026/01/17 19:43:01 by vilopes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,16 @@ int	is_builtin(char *cmd_name)
 		|| ft_strcmp(cmd_name, "exit") == 0)
 		return (1);
 	return (0);
+}
+
+int is_state_changing(char *name)
+{
+	if (!name)
+		return 0;
+	if (ft_strcmp(name, "cd") == 0 || ft_strcmp(name, "export") == 0
+		|| ft_strcmp(name, "unset") == 0 || ft_strcmp(name, "exit") == 0)
+		return 1;
+	return 0;
 }
 
 int	exec_builtin(t_cmd *cmd, t_shell *shell)
@@ -93,6 +103,45 @@ static char *find_path(char *cmd, char **env)
 	return (NULL);
 }
 
+static int apply_redirs(t_cmd *cmd)
+{
+	t_redir *redir = cmd->redirs;
+	while (redir)
+	{
+		if (redir->type == IN)
+		{
+			int fd = open(redir->file, O_RDONLY);
+			if (fd == -1)
+				return (perror(redir->file), 1);
+			dup2(fd, STDIN_FILENO);
+			close(fd);
+		}
+		else if (redir->type == OUT)
+		{
+			int fd = open(redir->file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			if (fd == -1)
+				return (perror(redir->file), 1);
+			dup2(fd, STDOUT_FILENO);
+			close(fd);
+		}
+		else if (redir->type == APPEND)
+		{
+			int fd = open(redir->file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			if (fd == -1)
+				return (perror(redir->file), 1);
+			dup2(fd, STDOUT_FILENO);
+			close(fd);
+		}
+		else if (redir->type == HEREDOC && redir->heredoc_fd != -1)
+		{
+			dup2(redir->heredoc_fd, STDIN_FILENO);
+			close(redir->heredoc_fd);
+		}
+		redir = redir->next;
+	}
+	return (0);
+}
+
 int executor(t_shell *shell)
 {
 	t_cmd *cmd = shell->cmds;
@@ -100,8 +149,8 @@ int executor(t_shell *shell)
 
 	if (num_cmds == 1)
 	{
-		if (is_builtin(cmd->args[0]))
-			return (exec_builtin(cmd, shell));  // Builtin no parent (sem fork)
+		if (is_builtin(cmd->args[0]) && cmd->redirs == NULL && is_state_changing(cmd->args[0]))
+			return (exec_builtin(cmd, shell));  // Sem fork para cd/export sem redirs
 		else
 		{
 			pid_t pid = fork();
@@ -109,16 +158,23 @@ int executor(t_shell *shell)
 				return (1);
 			if (pid == 0)
 			{
-				char *path = find_path(cmd->args[0], shell->env);
-				if (!path)
+				if (apply_redirs(cmd) != 0)
+					exit(1);
+				if (is_builtin(cmd->args[0]))
+					exit(exec_builtin(cmd, shell));
+				else
 				{
-					ft_putstr_fd(cmd->args[0], STDERR_FILENO);
-					ft_putendl_fd(": command not found", STDERR_FILENO);
+					char *path = find_path(cmd->args[0], shell->env);
+					if (!path)
+					{
+						ft_putstr_fd(cmd->args[0], STDERR_FILENO);
+						ft_putendl_fd(": command not found", STDERR_FILENO);
+						exit(127);
+					}
+					execve(path, cmd->args, shell->env);
+					perror(cmd->args[0]);
 					exit(127);
 				}
-				execve(path, cmd->args, shell->env);
-				perror(cmd->args[0]);
-				exit(127);
 			}
 			int status;
 			waitpid(pid, &status, 0);
@@ -131,7 +187,7 @@ int executor(t_shell *shell)
 	}
 	else
 	{
-		printf("Pipelines nao implementados ainda!\n");  // Placeholder para pipes
+		printf("Pipelines nao implementados ainda!\n");
 		return (1);
 	}
 }

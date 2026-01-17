@@ -72,35 +72,35 @@ int	main(int ac, char **av, char **envp)
 		if (*shell.line)
 			add_history(shell.line);
 		shell.tokens = lexer(shell.line);
-		printf("	1.Tokens before expansion:\n");
-		print_tokens(shell.tokens);
+		//printf("	1.Tokens before expansion:\n");
+		//print_tokens(shell.tokens);
 		shell.cmds = parser(shell.tokens);
 		if (!shell.cmds)
 		{
-			printf("	⚠️ Parser error, skipping line\n");
+			//printf("	⚠️ Parser error, skipping line\n");
 			g_exit_status = 2;
 			free_shell(&shell);
 			continue ;
 		}
 		if (heredoc_handle(&shell) != 0)
 		{
-			printf("	⚠️ Heredoc error, skipping line\n");
+			//printf("	⚠️ Heredoc error, skipping line\n");
 			g_exit_status = 1;
 			free_shell(&shell);
 			continue ;
 		}
-		printf("	2.After heredoc_handle:\n");
-		print_cmds(shell.cmds);
+		//printf("	2.After heredoc_handle:\n");
+		//print_cmds(shell.cmds);
 		if (expand(&shell) != 0)
 		{
-			printf("	⚠️ Expand error\n");
+			//printf("	⚠️ Expand error\n");
 			g_exit_status = 1;
 			free_shell(&shell);
 			continue ;
 		}
-		printf("	3.After expand:\n");
-		print_cmds(shell.cmds);
-		printf("\n\n");
+		//printf("	3.After expand:\n");
+		//print_cmds(shell.cmds);
+		//printf("\n\n");
 		g_exit_status = executor(&shell);
 		free_shell(&shell);
 	}
