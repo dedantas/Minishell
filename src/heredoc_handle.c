@@ -61,7 +61,7 @@ static int	child_heredoc(int pipe_fd[2], char *delimiter, int expand,
 			out_line = expand_word(shell, line);
 		else
 			out_line = ft_strdup(line);
-		write(pipe_fd[1], out_line, strlen(line));
+		write(pipe_fd[1], out_line, ft_strlen(out_line));
 		write(pipe_fd[1], "\n", 1);
 		free(line);
 		free(out_line);
