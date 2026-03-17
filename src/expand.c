@@ -92,7 +92,7 @@ static void	expand_redirs(t_shell *shell, t_cmd *cmd)
 /*
 ** Expansão do heredoc (se permitido)
 */
-static int	expand_heredoc(t_shell *shell, t_redir *redir)
+/*static int	expand_heredoc(t_shell *shell, t_redir *redir)
 {
 	char	*line;
 	char	*expanded;
@@ -119,7 +119,7 @@ static int	expand_heredoc(t_shell *shell, t_redir *redir)
 	close(redir->heredoc_fd);
 	redir->heredoc_fd = pipe_fd[0];
 	return (0);
-}
+}*/
 
 /*
 ** Função principal chamada após parser + heredoc_read
@@ -127,14 +127,14 @@ static int	expand_heredoc(t_shell *shell, t_redir *redir)
 int	expand(t_shell *shell)
 {
 	t_cmd	*cmd;
-	t_redir	*redir;
+	//t_redir	*redir;
 
 	cmd = shell->cmds;
 	while (cmd)
 	{
 		expand_args(shell, cmd);
 		expand_redirs(shell, cmd);
-		redir = cmd->redirs;
+		/*redir = cmd->redirs;
 		while (redir)
 		{
 			if (redir->type == HEREDOC && redir->heredoc_fd != -1)
@@ -143,7 +143,7 @@ int	expand(t_shell *shell)
 					return (1);
 			}
 			redir = redir->next;
-		}
+		}*/
 		cmd = cmd->next;
 	}
 	return (0);
