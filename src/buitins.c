@@ -90,6 +90,7 @@ int	mini_exit(t_cmd *cmd, t_shell *shell)
 {
 	int	exit_code;
 
+	ft_putendl_fd("exit", STDOUT_FILENO);
 	if (!cmd || !cmd->args || !cmd->args[0])
 		exit(0);
 	if (!cmd->args[1])

@@ -7,7 +7,7 @@ LIBFT	= libft/libft.a
 SRC	= src/main.c src/ultils.c src/lexer.c src/parser.c \
 	  src/heredoc_handle.c src/expand.c src/exec.c src/buitins.c \
 	  src/buitins2.c src/buitins3.c src/buitins4.c src/buitins5.c \
-	  src/new_add.c src/free.c
+	  src/new_add.c src/free.c src/signals.c
 OBJ	= $(SRC:.c=.o)
 #SANITIZER	= -fsanitize=thread
 

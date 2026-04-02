@@ -12,32 +12,13 @@
 
 #include "../minishell.h"
 
-/*static int g_signal = 0; // global para sinal do heredoc
-
-// controle de sinais
-void set_signal_mode(int mode)
-{
-	if (mode == 0) // ignore Ctrl-C
-		signal(SIGINT, SIG_IGN);
-	else if (mode == 1) // heredoc mode
-		signal(SIGINT, [](int sig){ g_signal = sig; });
-}
-
-// código de saída do filho
-static int child_exit_code(void)
-{
-	if (g_signal == SIGINT)
-		return 128 + SIGINT;
-	return EXIT_SUCCESS;
-}*/
-
 // filho lê o heredoc
 
 static int	heredoc_stop(char *line, char *delimiter)
 {
 	if (!line)
 		return (1);
-	if (strcmp(line, delimiter) == 0)
+	if (ft_strcmp(line, delimiter) == 0)
 	{
 		free(line);
 		return (1);
@@ -52,6 +33,7 @@ static int	child_heredoc(int pipe_fd[2], char *delimiter, int expand,
 	char	*out_line;
 
 	close(pipe_fd[0]);
+	signal(SIGINT, SIG_DFL);
 	while (1)
 	{
 		line = readline("> ");
@@ -77,10 +59,11 @@ static int	parent_heredoc(int pipe_fd[2], pid_t pid)
 
 	close(pipe_fd[1]);
 	waitpid(pid, &status, 0);
-	if (WIFEXITED(status) && WEXITSTATUS(status) == 128 + SIGINT)
+	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
 	{
+		write(1, "\n", 1);
 		close(pipe_fd[0]);
-		return (1);
+		return (-1);
 	}
 	return (pipe_fd[0]);
 }

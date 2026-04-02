@@ -73,6 +73,8 @@ static char	*get_cd_path(t_cmd *cmd, t_shell *shell)
 		path = ft_getenv(shell->env, "OLDPWD");
 		if (path)
 			printf("%s\n", path);
+		else
+			                        ft_putendl_fd("minishell: cd: OLDPWD not set", STDERR_FILENO);
 		return (path);
 	}
 	return (cmd->args[1]);
@@ -89,8 +91,7 @@ int	mini_cd(t_cmd *cmd, t_shell *shell)
 		return (perror("minishell: cd"), 1);
 	path = get_cd_path(cmd, shell);
 	if (!path || !*path)
-		return (ft_putstr_fd("minishell: cd: HOME not set\n",
-				STDERR_FILENO), 1);
+		return (ft_putstr_fd("minishell: cd: HOME not set\n",STDERR_FILENO), 1);
 	if (chdir(path) == -1)
 	{
 		ft_putstr_fd("minishell: cd: ", STDERR_FILENO);

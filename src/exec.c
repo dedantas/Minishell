@@ -142,52 +142,114 @@ static int apply_redirs(t_cmd *cmd)
 	return (0);
 }
 
+/*
+** Executa um comando filho (builtin ou externo)
+** prev_fd: stdin do comando anterior (pipe)
+** next_fd: stdout do comando atual (pipe)
+*/
+static int exec_child(t_cmd *cmd, t_shell *shell, int prev_fd, int next_fd)
+{
+    if (prev_fd != STDIN_FILENO)
+        dup2(prev_fd, STDIN_FILENO);
+    if (next_fd != STDOUT_FILENO)
+        dup2(next_fd, STDOUT_FILENO);
+
+    if (apply_redirs(cmd) != 0)
+        exit(1);
+
+    if (is_builtin(cmd->args[0]) && !is_state_changing(cmd->args[0]))
+        exit(exec_builtin(cmd, shell));
+
+    char *path = find_path(cmd->args[0], shell->env);
+    if (!path)
+    {
+        ft_putstr_fd(cmd->args[0], STDERR_FILENO);
+        ft_putendl_fd(": command not found", STDERR_FILENO);
+        exit(127);
+    }
+    execve(path, cmd->args, shell->env);
+    perror(cmd->args[0]);
+    exit(127);
+}
+
+/*
+** Espera todos os filhos do pipeline e retorna exit status do último
+*/
+static int wait_children(pid_t *pids, int n)
+{
+    int i;
+    int status;
+    int last_status = 0;
+
+    i = 0;
+    while (i < n)
+    {
+        waitpid(pids[i], &status, 0);
+        if (WIFEXITED(status))
+            last_status = WEXITSTATUS(status);
+        if (WIFSIGNALED(status))
+            last_status = 128 + WTERMSIG(status);
+        i++;
+    }
+    return (last_status);
+}
+
+/*
+** Executor com suporte a pipelines e heredoc
+*/
 int executor(t_shell *shell)
 {
-	t_cmd *cmd = shell->cmds;
-	int num_cmds = count_cmds(cmd);
+    t_cmd *cmd;
+    int pipe_fd[2];
+    int prev_fd;
+    pid_t *pids;
+    int n;
+    int i;
 
-	if (num_cmds == 1)
+    if (!shell->cmds)
+	    return (1);
+    n = count_cmds(shell->cmds);
+    pids = malloc(sizeof(pid_t) * n);
+    if (!pids)
+        return (1);
+
+    i = 0;
+    cmd = shell->cmds;
+	if (n == 1 && is_builtin(cmd->args[0]) && is_state_changing(cmd->args[0]))
 	{
-		if (is_builtin(cmd->args[0]) && cmd->redirs == NULL && is_state_changing(cmd->args[0]))
-			return (exec_builtin(cmd, shell));  // Sem fork para cd/export sem redirs
-		else
-		{
-			pid_t pid = fork();
-			if (pid == -1)
-				return (1);
-			if (pid == 0)
-			{
-				if (apply_redirs(cmd) != 0)
-					exit(1);
-				if (is_builtin(cmd->args[0]))
-					exit(exec_builtin(cmd, shell));
-				else
-				{
-					char *path = find_path(cmd->args[0], shell->env);
-					if (!path)
-					{
-						ft_putstr_fd(cmd->args[0], STDERR_FILENO);
-						ft_putendl_fd(": command not found", STDERR_FILENO);
-						exit(127);
-					}
-					execve(path, cmd->args, shell->env);
-					perror(cmd->args[0]);
-					exit(127);
-				}
-			}
-			int status;
-			waitpid(pid, &status, 0);
-			if (WIFEXITED(status))
-				return (WEXITSTATUS(status));
-			if (WIFSIGNALED(status))
-				return (128 + WTERMSIG(status));
-			return (1);
-		}
+		if (apply_redirs(cmd) != 0)
+			return (free(pids), 1);
+		shell->exit_status = exec_builtin(cmd, shell);
+		return (free(pids), shell->exit_status);
 	}
-	else
-	{
-		printf("Pipelines nao implementados ainda!\n");
-		return (1);
-	}
+    prev_fd = STDIN_FILENO;
+    while (cmd)
+    {
+        if (cmd->next)
+            pipe(pipe_fd);
+        else
+        {
+            pipe_fd[0] = STDIN_FILENO;
+            pipe_fd[1] = STDOUT_FILENO;
+        }
+
+        pids[i] = fork();
+        if (pids[i] == 0)
+        {
+            signal(SIGINT, SIG_DFL);
+            signal(SIGQUIT, SIG_DFL);
+            exec_child(cmd, shell, prev_fd, pipe_fd[1]);
+        }
+
+        if (prev_fd != STDIN_FILENO)
+            close(prev_fd);
+        if (pipe_fd[1] != STDOUT_FILENO)
+            close(pipe_fd[1]);
+
+        prev_fd = pipe_fd[0];
+        cmd = cmd->next;
+        i++;
+    }
+    shell->exit_status = wait_children(pids, n);
+    return (free(pids), shell->exit_status);
 }

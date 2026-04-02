@@ -40,56 +40,93 @@ int	is_redir(t_type type)
 		|| type == APPEND || type == HEREDOC);
 }
 
-static int	handle_redir(t_cmd *current, t_token **tokens)
+static int handle_redir(t_cmd *current, t_token **tokens)
 {
-	int	do_expand;
-
-	if (!(*tokens)->next || (*tokens)->next->type != WORD)
-		return (0);
-	do_expand = 1;
-	if ((*tokens)->type == HEREDOC)
-		do_expand = ((*tokens)->next->quote == NO);
-	add_redir(current, (*tokens)->type,
-		(*tokens)->next->value, do_expand);
-	*tokens = (*tokens)->next;
-	return (1);
+    if (!(*tokens)->next)
+    {
+        ft_putendl_fd("minishell: syntax error near unexpected token `newline'", 2);
+        return (0);
+    }
+    if ((*tokens)->next->type != WORD)
+    {
+        ft_putendl_fd("minishell: syntax error near unexpected token", 2);
+        return (0);
+    }
+    int do_expand = 1;
+    if ((*tokens)->type == HEREDOC)
+        do_expand = ((*tokens)->next->quote == NO);
+    add_redir(current, (*tokens)->type,
+            (*tokens)->next->value, do_expand);
+    *tokens = (*tokens)->next;
+    return (1);
 }
 
-static int	handle_pipe(t_cmd **current, t_token *tokens)
+static int handle_pipe(t_cmd **current, t_token *tokens)
 {
-	if (!(*current)->args || !tokens->next)
-		return (0);
-	*current = NULL;
-	return (1);
+    if (!*current)
+        return (0);
+    if (!(*current)->args && !(*current)->redirs)  // CORRIGIDO: comando vazio antes do pipe
+    {
+        ft_putendl_fd("minishell: syntax error near unexpected token `|'", 2);
+        return (0);
+    }
+    if (tokens->next && tokens->next->type == PIPE)
+    {
+        ft_putendl_fd("minishell: syntax error near unexpected token `|'", 2);
+        return (0);
+    }
+    if (!tokens->next)
+    {
+        ft_putendl_fd("minishell: syntax error near unexpected token `|'", 2);
+        return (0);
+    }
+
+    *current = NULL;
+    return (1);
 }
 
-t_cmd	*parser(t_token *tokens)
+t_cmd *parser(t_token *tokens)
 {
-	t_cmd	*cmds;
-	t_cmd	*current;
+    t_cmd *cmds;
+    t_cmd *current;
 
-	if (!tokens)
-		return (NULL);
-	cmds = NULL;
-	current = NULL;
-	while (tokens)
-	{
-		if (!current)
-		{
-			current = new_cmd();
-			add_cmd(&cmds, current);
-		}
-		if (tokens->type == WORD)
-			add_arg(current, tokens->value, tokens->quote);
-		else if (is_redir(tokens->type)
-			&& !handle_redir(current, &tokens))
-			return (printf("syntax error"), NULL);
-		else if (tokens->type == PIPE
-			&& !handle_pipe(&current, tokens))
-			return (printf("syntax error near |"), NULL);
-		tokens = tokens->next;
-	}
-	if (current && !current->args)
-		return (printf("syntax error near unexpected token `newline'"), NULL);
-	return (cmds);
+    if (!tokens)
+        return (NULL);
+    cmds = NULL;
+    current = NULL;
+    while (tokens)
+    {
+        if (!current)
+        {
+            current = new_cmd();
+            add_cmd(&cmds, current);
+        }
+        if (tokens->type == WORD)
+            add_arg(current, tokens->value, tokens->quote);
+        else if (is_redir(tokens->type))
+        {
+            if (!handle_redir(current, &tokens))
+            {
+                free_cmds(cmds);
+                return (NULL);
+            }
+        }
+        else if (tokens->type == PIPE)
+        {
+            if (!handle_pipe(&current, tokens))
+            {
+                free_cmds(cmds);
+                return (NULL);
+            }
+        }
+        tokens = tokens->next;
+    }
+    // Verifica último comando
+    if (current && !current->args && !current->redirs)
+    {
+        ft_putendl_fd("minishell: syntax error near unexpected token `newline'", 2);
+        free_cmds(cmds);
+        return (NULL);
+    }
+    return (cmds);
 }

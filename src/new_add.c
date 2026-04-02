@@ -86,7 +86,7 @@ void	add_arg(t_cmd *cmd, char *value, t_quote quote)
 	while (cmd->args && cmd->args[i])
 		i++;
 	new = malloc(sizeof(char *) * (i + 2));
-	new_quote = malloc(sizeof(t_quote) * (i * 2));
+	new_quote = malloc(sizeof(t_quote) * (i + 1));
 	j = -1;
 	while (++j < i)
 	{

@@ -12,30 +12,86 @@
 
 #include "../minishell.h"
 
-/*
-** Expande $VAR ou $?
-** NÃO suporta concatenação (mínimo exigido pela 42)
-*/
-char	*expand_word(t_shell *shell, char *str)
+static char *get_var_value(t_shell *shell, char *name)
 {
-	char	*dollar;
-	char	*var;
-	char	*value;
-	int g_exit_status = 0;
+    char *value;
 
-	dollar = ft_strchr(str, '$');
-	if (!dollar)
-		return (ft_strdup(str));
-	if (*(dollar + 1) == '?')
-		return (ft_itoa(g_exit_status));
-	var = ft_strdup(dollar + 1);
-	if (!var)
-		return (NULL);
-	value = ft_getenv(shell->env, var);
-	free(var);
-	if (!value)
-		return (ft_strdup(""));
-	return (ft_strdup(value));
+    if (ft_strcmp(name, "?") == 0)
+        return (ft_itoa(shell->exit_status));
+    value = ft_getenv(shell->env, name);
+    if (!value)
+        return (ft_strdup(""));
+    return (ft_strdup(value));
+}
+
+char *expand_word(t_shell *shell, char *str)
+{
+    int i = 0;
+    char *result = ft_strdup("");
+    char *tmp;
+    int in_dquote;  // CORRIGIDO: controle de aspas duplas
+
+    in_dquote = 0;
+    while (str[i])
+    {
+        if (str[i] == '"' && !in_dquote)
+        {
+            tmp = ft_strjoin(result, "\"");
+            free(result);
+            result = tmp;
+            in_dquote = 1;
+            i++;
+        }
+        else if (str[i] == '"' && in_dquote)
+        {
+            tmp = ft_strjoin(result, "\"");
+            free(result);
+            result = tmp;
+            in_dquote = 0;
+            i++;
+        }
+        else if (str[i] == '$')
+        {
+		if (!str[i + 1] || (!ft_isalnum(str[i + 1])
+		&& str[i + 1] != '_' && str[i + 1] != '?'))
+		{
+			tmp = ft_strjoin(result, "$");
+			free(result);
+			result = tmp;
+			i++;
+			continue;
+		}
+		i++;
+            int start = i;
+
+            if (str[i] == '?')
+                i++;
+            else
+            {
+                while (ft_isalnum(str[i]) || str[i] == '_')
+                    i++;
+            }
+
+            char *name = ft_substr(str, start, i - start);
+            char *value = get_var_value(shell, name);
+
+            tmp = ft_strjoin(result, value);
+            free(result);
+            result = tmp;
+
+            free(name);
+            free(value);
+        }
+        else
+        {
+            char c[2] = {str[i], 0};
+            tmp = ft_strjoin(result, c);
+            free(result);
+            result = tmp;
+            i++;
+        }
+    }
+    return (result);
 }
 
 /*
@@ -49,13 +105,11 @@ static void	expand_args(t_shell *shell, t_cmd *cmd)
 	i = 0;
 	while (cmd->args && cmd->args[i])
 	{
-		printf("	[EXPAND ARG] before='%s'\n", cmd->args[i]);
 		if (cmd->arg_quote[i] != SINGLE)
 		{
 			expanded = expand_word(shell, cmd->args[i]);
 			if (expanded)
 			{
-				printf("	[EXPAND ARG] after ='%s'\n", expanded);
 				free(cmd->args[i]);
 				cmd->args[i] = expanded;
 			}
@@ -75,13 +129,11 @@ static void	expand_redirs(t_shell *shell, t_cmd *cmd)
 	redir = cmd->redirs;
 	while (redir)
 	{
-		printf("[EXPAND REDIR] before='%s'\n", redir->file);
 		if (redir->type != HEREDOC)
 		{
 			expanded = expand_word(shell, redir->file);
 			if (expanded)
 			{
-				printf("[EXPAND REDIR] after ='%s'\n", expanded);
 				free(redir->file);
 				redir->file = expanded;
 			}
@@ -89,62 +141,18 @@ static void	expand_redirs(t_shell *shell, t_cmd *cmd)
 		redir = redir->next;
 	}
 }
-
-/*
-** Expansão do heredoc (se permitido)
-*/
-/*static int	expand_heredoc(t_shell *shell, t_redir *redir)
-{
-	char	*line;
-	char	*expanded;
-	int		pipe_fd[2];
-
-	if (pipe(pipe_fd) == -1)
-		return (1);
-	line = get_next_line(redir->heredoc_fd);
-	while (line)
-	{
-		printf("[HEREDOC] before='%s'\n", line);
-		if (redir->expand)
-			expanded = expand_word(shell, line);
-		else
-			expanded = ft_strdup(line);
-		printf("[HEREDOC] after ='%s'\n", expanded);
-		free(line);
-		write(pipe_fd[1], expanded, ft_strlen(expanded));
-		write(pipe_fd[1], "\n", 1);
-		free(expanded);
-		line = get_next_line(redir->heredoc_fd);
-	}
-	close(pipe_fd[1]);
-	close(redir->heredoc_fd);
-	redir->heredoc_fd = pipe_fd[0];
-	return (0);
-}*/
-
 /*
 ** Função principal chamada após parser + heredoc_read
 */
 int	expand(t_shell *shell)
 {
 	t_cmd	*cmd;
-	//t_redir	*redir;
 
 	cmd = shell->cmds;
 	while (cmd)
 	{
 		expand_args(shell, cmd);
 		expand_redirs(shell, cmd);
-		/*redir = cmd->redirs;
-		while (redir)
-		{
-			if (redir->type == HEREDOC && redir->heredoc_fd != -1)
-			{
-				if (expand_heredoc(shell, redir))
-					return (1);
-			}
-			redir = redir->next;
-		}*/
 		cmd = cmd->next;
 	}
 	return (0);
