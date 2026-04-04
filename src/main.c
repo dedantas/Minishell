@@ -6,7 +6,7 @@
 /*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 18:31:07 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/15 19:08:42 by dedantas         ###   ########.fr       */
+/*   Updated: 2026/04/04 16:12:52 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int	main(int ac, char **av, char **envp)
 	(void)av;
 	shell.exit_status = 0;
 	shell.env = ft_envdup(envp);
-	setup_signals();	
+	setup_signals();
 	while (1)
 	{
 		shell.line = readline("🔹 minishell$ ");

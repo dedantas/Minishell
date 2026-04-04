@@ -6,97 +6,96 @@
 /*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/14 19:22:04 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/17 18:10:03 by vilopes          ###   ########.fr       */
+/*   Updated: 2026/04/04 16:44:10 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-static char *get_var_value(t_shell *shell, char *name)
+static char	*get_var_value(t_shell *shell, char *name)
 {
-    char *value;
+	char	*value;
 
-    if (ft_strcmp(name, "?") == 0)
-        return (ft_itoa(shell->exit_status));
-    value = ft_getenv(shell->env, name);
-    if (!value)
-        return (ft_strdup(""));
-    return (ft_strdup(value));
+	if (ft_strcmp(name, "?") == 0)
+		return (ft_itoa(shell->exit_status));
+	value = ft_getenv(shell->env, name);
+	if (!value)
+		return (ft_strdup(""));
+	return (ft_strdup(value));
 }
 
-char *expand_word(t_shell *shell, char *str)
+char	*expand_word(t_shell *shell, char *str)
 {
-    int i = 0;
-    char *result = ft_strdup("");
-    char *tmp;
-    int in_dquote;  // CORRIGIDO: controle de aspas duplas
+	int		i;
+	char	*result;
+	char	*tmp;
+	int		in_dquote;
+	int		start;
+	char	*name;
+	char	*value;
+	//char	c[2];
 
-    in_dquote = 0;
-    while (str[i])
-    {
-        if (str[i] == '"' && !in_dquote)
-        {
-            tmp = ft_strjoin(result, "\"");
-            free(result);
-            result = tmp;
-            in_dquote = 1;
-            i++;
-        }
-        else if (str[i] == '"' && in_dquote)
-        {
-            tmp = ft_strjoin(result, "\"");
-            free(result);
-            result = tmp;
-            in_dquote = 0;
-            i++;
-        }
-        else if (str[i] == '$')
-        {
-		if (!str[i + 1] || (!ft_isalnum(str[i + 1])
-		&& str[i + 1] != '_' && str[i + 1] != '?'))
+	i = 0;
+	result = ft_strdup("");
+	in_dquote = 0;
+	while (str[i])
+	{
+		if (str[i] == '"' && !in_dquote)
 		{
-			tmp = ft_strjoin(result, "$");
+			tmp = ft_strjoin(result, "\"");
+			free(result);
+			result = tmp;
+			in_dquote = 1;
+			i++;
+		}
+		else if (str[i] == '"' && in_dquote)
+		{
+			tmp = ft_strjoin(result, "\"");
+			free(result);
+			result = tmp;
+			in_dquote = 0;
+			i++;
+		}
+		else if (str[i] == '$')
+		{
+			if (!str[i + 1] || (!ft_isalnum(str[i + 1])
+					&& str[i + 1] != '_' && str[i + 1] != '?'))
+			{
+				tmp = ft_strjoin(result, "$");
+				free(result);
+				result = tmp;
+				i++;
+				continue ;
+			}
+			i++;
+			start = i;
+			if (str[i] == '?')
+				i++;
+			else
+			{
+				while (ft_isalnum(str[i]) || str[i] == '_')
+					i++;
+			}
+			name = ft_substr(str, start, i - start);
+			value = get_var_value(shell, name);
+			tmp = ft_strjoin(result, value);
+			free(result);
+			result = tmp;
+			free(name);
+			free(value);
+		}
+		else
+		{
+			char c[2] = {str[i], 0};
+			tmp = ft_strjoin(result, c);
 			free(result);
 			result = tmp;
 			i++;
-			continue;
 		}
-		i++;
-            int start = i;
-
-            if (str[i] == '?')
-                i++;
-            else
-            {
-                while (ft_isalnum(str[i]) || str[i] == '_')
-                    i++;
-            }
-
-            char *name = ft_substr(str, start, i - start);
-            char *value = get_var_value(shell, name);
-
-            tmp = ft_strjoin(result, value);
-            free(result);
-            result = tmp;
-
-            free(name);
-            free(value);
-        }
-        else
-        {
-            char c[2] = {str[i], 0};
-            tmp = ft_strjoin(result, c);
-            free(result);
-            result = tmp;
-            i++;
-        }
-    }
-    return (result);
+	}
+	return (result);
 }
 
-/*
-** Expande argumentos do comando
-*/
 static void	expand_args(t_shell *shell, t_cmd *cmd)
 {
 	int		i;
@@ -141,6 +140,7 @@ static void	expand_redirs(t_shell *shell, t_cmd *cmd)
 		redir = redir->next;
 	}
 }
+
 /*
 ** Função principal chamada após parser + heredoc_read
 */

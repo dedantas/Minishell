@@ -6,7 +6,7 @@
 /*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/15 02:32:52 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/15 02:38:11 by dedantas         ###   ########.fr       */
+/*   Updated: 2026/04/04 14:42:33 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int	mini_env(t_shell *shell)
 static int	is_valid_var_name(const char *str, int eq)
 {
 	int	j;
-	
+
 	if (eq == 0)
 		return (1);
 	if (!ft_isalpha(str[0]) && str[0] != '_')
@@ -61,21 +61,20 @@ static void	process_export_arg(t_shell *shell, char *arg)
 		eq++;
 	if (eq == 0)
 	{
-                // Variável sem valor - só valida nome
-                if (is_valid_var_name(arg, ft_strlen(arg)))
-                {
-                        if (find_env_index(shell->env, arg) == -1)
-                                up_env_var(shell, arg, ft_strlen(arg));
-                }
-                else
-                        export_error(arg);
-                return ;
-        }
-        if (!is_valid_var_name(arg, eq))
-        {
-                export_error(arg);
-                return ;
-        }
+		if (is_valid_var_name(arg, ft_strlen(arg)))
+		{
+			if (find_env_index(shell->env, arg) == -1)
+				up_env_var(shell, arg, ft_strlen(arg));
+		}
+		else
+			export_error(arg);
+		return ;
+	}
+	if (!is_valid_var_name(arg, eq))
+	{
+		export_error(arg);
+		return ;
+	}
 	up_env_var(shell, arg, eq);
 }
 

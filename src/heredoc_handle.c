@@ -6,14 +6,13 @@
 /*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/14 19:30:21 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/14 19:40:15 by dedantas         ###   ########.fr       */
+/*   Updated: 2026/04/04 16:42:17 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
 // filho lê o heredoc
-
 static int	heredoc_stop(char *line, char *delimiter)
 {
 	if (!line)
@@ -90,38 +89,37 @@ int	heredoc_read(t_shell *shell, char *delimiter, int expand)
 }
 
 // heredoc_handle.c - modifique a função heredoc_handle
-
-int     heredoc_handle(t_shell *shell)
+int	heredoc_handle(t_shell *shell)
 {
-        t_cmd   *cmd;
-        t_redir *redir;
+	t_cmd	*cmd;
+	t_redir	*redir;
 
-        cmd = shell->cmds;
-        while (cmd)
-        {
-                redir = cmd->redirs;
-                while (redir)
-                {
-                        if (redir->type == HEREDOC)
-                        {
-                                // Verifica se o delimiter é válido
-                                if (!redir->file || ft_strlen(redir->file) == 0)
-                                {
-                                        ft_putendl_fd("minishell: syntax error near unexpected token `newline'", 2);
-                                        return (1);
-                                }
-                                redir->heredoc_fd = heredoc_read(shell, redir->file, redir->expand);
-                                if (redir->heredoc_fd == -1)
-                                {
-                                        shell->exit_status = 130;
-                                        return (1);
-                                }
-                        }
-                        redir = redir->next;
-                }
-                cmd = cmd->next;
-        }
-        return (0);
+	cmd = shell->cmds;
+	while (cmd)
+	{
+		redir = cmd->redirs;
+		while (redir)
+		{
+			if (redir->type == HEREDOC)
+			{
+				if (!redir->file || ft_strlen(redir->file) == 0)
+				{
+					ft_putendl_fd("minishell: syntax error near unexpected token `newline'", 2);
+					return (1);
+				}
+				redir->heredoc_fd = heredoc_read(shell,
+						redir->file, redir->expand);
+				if (redir->heredoc_fd == -1)
+				{
+					shell->exit_status = 130;
+					return (1);
+				}
+			}
+			redir = redir->next;
+		}
+		cmd = cmd->next;
+	}
+	return (0);
 }
 
 /*int	heredoc_handle(t_shell *shell)
