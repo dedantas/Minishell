@@ -33,7 +33,6 @@ char	*expand_word(t_shell *shell, char *str)
 	int		start;
 	char	*name;
 	char	*value;
-	//char	c[2];
 
 	i = 0;
 	result = ft_strdup("");

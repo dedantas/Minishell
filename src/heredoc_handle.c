@@ -88,6 +88,23 @@ int	heredoc_read(t_shell *shell, char *delimiter, int expand)
 		return (parent_heredoc(pipe_fd, pid));
 }
 
+static int	handle_single_heredoc(t_shell *shell, t_redir *redir)
+{
+	if (!redir->file || ft_strlen(redir->file) == 0)
+	{
+		ft_putendl_fd("minishell: syntax error near unexpected token `newline'",
+			2);
+		return (1);
+	}
+	redir->heredoc_fd = heredoc_read(shell, redir->file, redir->expand);
+	if (redir->heredoc_fd == -1)
+	{
+		shell->exit_status = 130;
+		return (1);
+	}
+	return (0);
+}
+
 // heredoc_handle.c - modifique a função heredoc_handle
 int	heredoc_handle(t_shell *shell)
 {
@@ -101,20 +118,8 @@ int	heredoc_handle(t_shell *shell)
 		while (redir)
 		{
 			if (redir->type == HEREDOC)
-			{
-				if (!redir->file || ft_strlen(redir->file) == 0)
-				{
-					ft_putendl_fd("minishell: syntax error near unexpected token `newline'", 2);
+				if (handle_single_heredoc(shell, redir))
 					return (1);
-				}
-				redir->heredoc_fd = heredoc_read(shell,
-						redir->file, redir->expand);
-				if (redir->heredoc_fd == -1)
-				{
-					shell->exit_status = 130;
-					return (1);
-				}
-			}
 			redir = redir->next;
 		}
 		cmd = cmd->next;

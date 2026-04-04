@@ -69,63 +69,49 @@ static char	*trim_whitespace(char *str)
 
 // parser.c - substitua a função handle_redir
 
-static int	handle_redir(t_cmd *current, t_token **tokens)
+static int	handle_heredoc(t_cmd *current, t_token *token)
 {
-	char	*delimiter;
 	char	*trimmed;
 	int		do_expand;
 
+	trimmed = trim_whitespace(token->next->value);
+	if (!trimmed || ft_strlen(trimmed) == 0)
+	{
+		ft_putendl_fd(
+			"minishell: syntax error near unexpected token `newline'", 2);
+		free(trimmed);
+		return (0);
+	}
+	do_expand = (token->next->quote == NO);
+	add_redir(current, token->type, trimmed, do_expand);
+	free(trimmed);
+	return (1);
+}
+
+static int	handle_redir(t_cmd *current, t_token **tokens)
+{
 	if (!(*tokens)->next)
 	{
-		ft_putendl_fd("minishell: syntax error near unexpected token `newline'", 2);
+		ft_putendl_fd(
+			"minishell: syntax error near unexpected token `newline'", 2);
 		return (0);
 	}
 	if ((*tokens)->next->type != WORD)
 	{
-		ft_putendl_fd("minishell: syntax error near unexpected token", 2);
+		ft_putendl_fd(
+			"minishell: syntax error near unexpected token", 2);
 		return (0);
 	}
-	do_expand = 1;
 	if ((*tokens)->type == HEREDOC)
 	{
-		trimmed = trim_whitespace((*tokens)->next->value);
-		if (!trimmed || ft_strlen(trimmed) == 0)
-		{
-			ft_putendl_fd("minishell: syntax error near unexpected token `newline'", 2);
-			free(trimmed);
+		if (!handle_heredoc(current, *tokens))
 			return (0);
-		}
-		delimiter = trimmed;
-		do_expand = ((*tokens)->next->quote == NO);
-		add_redir(current, (*tokens)->type, delimiter, do_expand);
-		free(delimiter);
 	}
 	else
-		add_redir(current, (*tokens)->type, (*tokens)->next->value, do_expand);
+		add_redir(current, (*tokens)->type, (*tokens)->next->value, 1);
 	*tokens = (*tokens)->next;
 	return (1);
 }
-
-/*static int handle_redir(t_cmd *current, t_token **tokens)
-{
-    if (!(*tokens)->next)
-    {
-        ft_putendl_fd("minishell: syntax error near unexpected token `newline'", 2);
-        return (0);
-    }
-    if ((*tokens)->next->type != WORD)
-    {
-        ft_putendl_fd("minishell: syntax error near unexpected token", 2);
-        return (0);
-    }
-    int do_expand = 1;
-    if ((*tokens)->type == HEREDOC)
-        do_expand = ((*tokens)->next->quote == NO);
-    add_redir(current, (*tokens)->type,
-            (*tokens)->next->value, do_expand);
-    *tokens = (*tokens)->next;
-    return (1);
-}*/
 
 static int	handle_pipe(t_cmd **current, t_token *tokens)
 {
@@ -150,6 +136,41 @@ static int	handle_pipe(t_cmd **current, t_token *tokens)
 	return (1);
 }
 
+static int	process_token(t_cmd **current, t_token **tokens, t_cmd **cmds)
+{
+	if ((*tokens)->type == WORD)
+		add_arg(*current, (*tokens)->value, (*tokens)->quote);
+	else if (is_redir((*tokens)->type))
+	{
+		if (!handle_redir(*current, tokens))
+		{
+			free_cmds(*cmds);
+			return (0);
+		}
+	}
+	else if ((*tokens)->type == PIPE)
+	{
+		if (!handle_pipe(current, *tokens))
+		{
+			free_cmds(*cmds);
+			return (0);
+		}
+	}
+	return (1);
+}
+
+static int	check_empty_cmd(t_cmd *current, t_cmd *cmds)
+{
+	if (current && !current->args && !current->redirs)
+	{
+		ft_putendl_fd(
+			"minishell: syntax error near unexpected token `newline'", 2);
+		free_cmds(cmds);
+		return (0);
+	}
+	return (1);
+}
+
 t_cmd	*parser(t_token *tokens)
 {
 	t_cmd	*cmds;
@@ -166,31 +187,11 @@ t_cmd	*parser(t_token *tokens)
 			current = new_cmd();
 			add_cmd(&cmds, current);
 		}
-		if (tokens->type == WORD)
-			add_arg(current, tokens->value, tokens->quote);
-		else if (is_redir(tokens->type))
-		{
-			if (!handle_redir(current, &tokens))
-			{
-				free_cmds(cmds);
-				return (NULL);
-			}
-		}
-		else if (tokens->type == PIPE)
-		{
-			if (!handle_pipe(&current, tokens))
-			{
-				free_cmds(cmds);
-				return (NULL);
-			}
-		}
+		if (!process_token(&current, &tokens, &cmds))
+			return (NULL);
 		tokens = tokens->next;
 	}
-	if (current && !current->args && !current->redirs)
-	{
-		ft_putendl_fd("minishell: syntax error near unexpected token `newline'", 2);
-		free_cmds(cmds);
+	if (!check_empty_cmd(current, cmds))
 		return (NULL);
-	}
 	return (cmds);
 }
