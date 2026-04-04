@@ -6,7 +6,7 @@
 /*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 18:58:02 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/14 21:04:35 by dedantas         ###   ########.fr       */
+/*   Updated: 2026/04/04 14:39:25 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,8 @@ static char	*get_cd_path(t_cmd *cmd, t_shell *shell)
 		path = ft_getenv(shell->env, "OLDPWD");
 		if (path)
 			printf("%s\n", path);
+		else
+			ft_putendl_fd("minishell: cd: OLDPWD not set", STDERR_FILENO);
 		return (path);
 	}
 	return (cmd->args[1]);

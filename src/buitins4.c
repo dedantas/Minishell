@@ -6,7 +6,7 @@
 /*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/15 02:32:52 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/15 02:38:11 by dedantas         ###   ########.fr       */
+/*   Updated: 2026/04/04 14:42:33 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,17 @@ int	mini_env(t_shell *shell)
 {
 	int	i;
 
-	i = 0;
 	if (!shell || !shell->env)
 		return (1);
-	while (shell->env[i] != NULL)
+	if (shell->cmds && shell->cmds->args[1])
+	{
+		ft_putstr_fd("env: ", 2);
+		ft_putstr_fd(shell->cmds->args[1], 2);
+		ft_putendl_fd(": No such file or directory", 2);
+		return (127);
+	}
+	i = 0;
+	while (shell->env[i])
 	{
 		ft_putendl_fd(shell->env[i], STDOUT_FILENO);
 		i++;
@@ -31,6 +38,8 @@ static int	is_valid_var_name(const char *str, int eq)
 {
 	int	j;
 
+	if (eq == 0)
+		return (1);
 	if (!ft_isalpha(str[0]) && str[0] != '_')
 		return (0);
 	j = 0;
@@ -50,7 +59,18 @@ static void	process_export_arg(t_shell *shell, char *arg)
 	eq = 0;
 	while (arg[eq] && arg[eq] != '=')
 		eq++;
-	if (eq == 0 || !is_valid_var_name(arg, eq))
+	if (eq == 0)
+	{
+		if (is_valid_var_name(arg, ft_strlen(arg)))
+		{
+			if (find_env_index(shell->env, arg) == -1)
+				up_env_var(shell, arg, ft_strlen(arg));
+		}
+		else
+			export_error(arg);
+		return ;
+	}
+	if (!is_valid_var_name(arg, eq))
 	{
 		export_error(arg);
 		return ;

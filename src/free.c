@@ -6,7 +6,7 @@
 /*   By: vilopes <vilopes@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/15 02:25:14 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/17 19:35:37 by vilopes          ###   ########.fr       */
+/*   Updated: 2026/04/04 15:38:23 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ static void	free_redirs(t_redir *redirs)
 	{
 		tmp = redirs;
 		redirs = redirs->next;
-		if (tmp->heredoc_fd != -1) //evitar leaks
+		if (tmp->heredoc_fd != -1)
 			close(tmp->heredoc_fd);
 		free(tmp->file);
 		free(tmp);
@@ -64,6 +64,7 @@ void	free_cmds(t_cmd *cmds)
 		tmp = cmds;
 		cmds = cmds->next;
 		free_args(tmp->args);
+		free(tmp->arg_quote);
 		free_redirs(tmp->redirs);
 		free(tmp);
 	}

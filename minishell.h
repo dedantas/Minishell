@@ -6,7 +6,7 @@
 /*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/15 02:43:18 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/15 03:32:19 by dedantas         ###   ########.fr       */
+/*   Updated: 2026/04/04 17:00:25 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,16 @@
 # define MINISHELL_H
 
 # include "libft/libft.h"
+# include <stdio.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <signal.h>
 # include <sys/wait.h>
 # include <limits.h>
 
-extern int g_exit_status;
+extern int	g_signal;
 
 typedef enum e_type // enum para saber o tipo de token
 {
@@ -44,26 +44,26 @@ typedef enum e_quote
 
 typedef struct s_token // lista de tokens
 {
-	t_type		type;
-	char		*value;
-	t_quote		quote;
-	struct		s_token					*next;
+	t_type			type;
+	char			*value;
+	t_quote			quote;
+	struct s_token	*next;
 }	t_token;
 
 typedef struct s_redir // lista de redirecionamento
 {
-	t_type		type;
-	char		*file;
-	int			heredoc_fd;
-	int			expand;
+	t_type			type;
+	char			*file;
+	int				heredoc_fd;
+	int				expand;
 	struct s_redir	*next;
 }	t_redir;
 
 typedef struct s_cmd // lista de comandos
 {
-	char		**args;
-	t_quote		*arg_quote;
-	t_redir		*redirs;
+	char			**args;
+	t_quote			*arg_quote;
+	t_redir			*redirs;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -73,6 +73,7 @@ typedef struct s_shell
 	char	*line; // linha de comando
 	t_token	*tokens;
 	t_cmd	*cmds;
+	int		exit_status;
 }	t_shell;
 
 char	**ft_envdup(char **arr);
@@ -80,6 +81,7 @@ char	**ft_envdup(char **arr);
 // ultils
 int		is_operator(char c);
 void	skip_whitespace(char **line);
+void	setup_signals(void);
 
 // Lexer
 t_token	*lexer(char *line);
@@ -106,6 +108,7 @@ void	export_error(char *arg);
 char	*ft_getenv(char **env, const char *name);
 int		check_cd_args(t_cmd *cmd);
 void	unset_var(t_shell *shell, const char *name);
+int		find_env_index(char **name, char *env);
 
 // New _ add
 t_token	*new_token(t_type type, char *value, t_quote quote);

@@ -1,7 +1,0 @@
-libft
-Makefile
-minishell
-minishell.h
-README.md
-src
-test.txt

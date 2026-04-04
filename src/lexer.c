@@ -6,15 +6,12 @@
 /*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 18:45:34 by dedantas          #+#    #+#             */
-/*   Updated: 2026/01/15 19:20:26 by dedantas         ###   ########.fr       */
+/*   Updated: 2026/04/04 16:11:51 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-/*
-** Lê conteúdo entre aspas (com suporte a aspas escapadas)
-*/
 char	*read_quote(char **line, char quote)
 {
 	char	*start;
@@ -25,26 +22,57 @@ char	*read_quote(char **line, char quote)
 	while (*end && *end != quote)
 		end++;
 	if (*end == quote)
+	{
 		*line = end + 1;
-	else
-		*line = end;
-	return (ft_substr(start, 0, end - start));
+		return (ft_substr(start, 0, end - start));
+	}
+	*line = end;
+	return (NULL);
 }
 
+// Substitua a função read_word no lexer.c
 char	*read_word(char **line)
 {
-	char	*start;
+	char	*buffer;
+	char	*temp;
+	char	quote_char;
+	int		in_quote;
 
-	start = *line;
-	while (**line && !ft_isspace(**line) && !is_operator(**line))
+	buffer = ft_strdup("");
+	in_quote = 0;
+	quote_char = 0;
+	while (**line && (!ft_isspace(**line) || in_quote))
+	{
+		if ((**line == '\'' || **line == '"') && !in_quote)
+		{
+			in_quote = 1;
+			quote_char = **line;
+			(*line)++;
+			continue ;
+		}
+		else if (**line == quote_char && in_quote)
+		{
+			in_quote = 0;
+			quote_char = 0;
+			(*line)++;
+			continue ;
+		}
+		if (!in_quote && is_operator(**line))
+			break ;
+		temp = ft_strjoin(buffer, (char[]){**line, 0});
+		free(buffer);
+		buffer = temp;
 		(*line)++;
-	return (ft_substr(start, 0, *line - start));
+	}
+	return (buffer);
 }
 
 static int	handle_operators(t_token **tokens, char **line)
 {
 	if (**line == '|' )
 		return (add_token(tokens, new_token(PIPE, "|", NO)), (*line)++, 1);
+	if (**line == '<' && *(*line + 1) == '<' && *(*line + 2) == '-')
+		return (add_token(tokens, new_token(HEREDOC, "<<", NO)), *line += 3, 1);
 	if (**line == '<' && *(*line + 1) == '<')
 		return (add_token(tokens, new_token(HEREDOC, "<<", NO)), *line += 2, 1);
 	if (**line == '>' && *(*line + 1) == '>')
@@ -65,9 +93,6 @@ static void	handle_word(t_token **tokens, char **line)
 	free(value);
 }
 
-/*
-** Lexer principal com melhor tratamento de erros
-*/
 t_token	*lexer(char *line)
 {
 	t_token	*tokens;
@@ -82,20 +107,31 @@ t_token	*lexer(char *line)
 		if (*line == '\'')
 		{
 			value = read_quote(&line, '\'');
+			if (!value)
+			{
+				ft_putendl_fd("minishell: unclosed quote", 2);
+				free_tokens(tokens);
+				return (NULL);
+			}
 			add_token(&tokens, new_token(WORD, value, SINGLE));
 			free(value);
-			continue ;
 		}
 		else if (*line == '"')
 		{
 			value = read_quote(&line, '"');
+			if (!value)
+			{
+				ft_putendl_fd("minishell: unclosed quote", 2);
+				free_tokens(tokens);
+				return (NULL);
+			}
 			add_token(&tokens, new_token(WORD, value, DOUBLE));
 			free(value);
-			continue ;
 		}
 		else if (handle_operators(&tokens, &line))
 			continue ;
-		handle_word(&tokens, &line);
+		else
+			handle_word(&tokens, &line);
 	}
 	return (tokens);
 }

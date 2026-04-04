@@ -34,7 +34,7 @@ int	mini_env2(char **env)
 	return (0);
 }
 
-static int	find_env_index(char **env, char *name)
+int	find_env_index(char **env, char *name)
 {
 	int	i;
 	int	len;
