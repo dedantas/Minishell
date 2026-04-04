@@ -80,6 +80,8 @@ static int	handle_operators(t_token **tokens, char **line)
 {
 	if (**line == '|' )
 		return (add_token(tokens, new_token(PIPE, "|", NO)), (*line)++, 1);
+	if (**line == '<' && *(*line + 1) == '<' && *(*line + 2) == '-')
+		return (add_token(tokens, new_token(HEREDOC, "<<", NO)), *line += 3, 1); //
 	if (**line == '<' && *(*line + 1) == '<')
 		return (add_token(tokens, new_token(HEREDOC, "<<", NO)), *line += 2, 1);
 	if (**line == '>' && *(*line + 1) == '>')

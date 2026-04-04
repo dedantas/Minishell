@@ -24,12 +24,12 @@ int	main(int ac, char **av, char **envp)
 	while (1)
 	{
 		shell.line = readline("🔹 minishell$ ");
-		if (g_signal == SIGINT)
+		/*if (g_signal == SIGINT)
 		{
 			shell.exit_status = 130;
 			g_signal = 0;
-			free(shell.line);
-		}
+			free(shell.line);	
+		}*/
 		if (!shell.line)
 			break ;
 		if (*shell.line)
