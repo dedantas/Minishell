@@ -13,7 +13,7 @@
 #include "../minishell.h"
 
 // filho lê o heredoc
-static int	heredoc_stop(char *line, char *delimiter)
+/*static int	heredoc_stop(char *line, char *delimiter)
 {
 	if (!line)
 		return (1);
@@ -23,7 +23,7 @@ static int	heredoc_stop(char *line, char *delimiter)
 		return (1);
 	}
 	return (0);
-}
+}*/
 
 static int	child_heredoc(int pipe_fd[2], char *delimiter, int expand,
 		t_shell *shell)

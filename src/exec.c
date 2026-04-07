@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
-int	is_builtin(char *cmd_name)
+/*int	is_builtin(char *cmd_name)
 {
 	if (!cmd_name)
 		return (0);
@@ -125,7 +125,7 @@ static int	apply_redirs(t_cmd *cmd)
 		redir = redir->next;
 	}
 	return (0);
-}
+}*/
 
 /*static int	apply_redirs(t_cmd *cmd)
 {
@@ -167,7 +167,7 @@ static int	apply_redirs(t_cmd *cmd)
 		redir = redir->next;
 	}
 	return (0);
-}*/
+}
 
 static char	*find_path(char *cmd, char **env)
 {
@@ -246,7 +246,7 @@ static int	exec_single_builtin(t_shell *shell, t_cmd *cmd, pid_t *pids)
 	shell->exit_status = exec_builtin(cmd, shell);
 	free(pids);
 	return (shell->exit_status);
-}
+}*/
 
 static void	setup_pipes(t_cmd *cmd, int prev_fd, int *pipe_fd)
 {
@@ -286,7 +286,49 @@ static void	exec_child(t_cmd *cmd, t_shell *shell, int prev_fd, int *pipe_fd)
 	exit(127);
 }
 
+static void	update_fds(int *prev_fd, int pipe_fd[2], t_cmd *cmd)
+{
+	if (*prev_fd != -1)
+		close(*prev_fd);
+	if (cmd->next)
+	{
+		close(pipe_fd[1]);
+		*prev_fd = pipe_fd[0];
+	}
+	else
+		*prev_fd = -1;
+}
+
 static int	exec_loop(t_shell *shell, pid_t *pids)
+{
+	t_cmd	*cmd;
+	int		pipe_fd[2];
+	int		prev_fd;
+	int		i;
+
+	cmd = shell->cmds;
+	prev_fd = -1;
+	i = 0;
+	while (cmd)
+	{
+		if (cmd->args && cmd->args[0])
+		{
+			if (cmd->next && pipe(pipe_fd) == -1)
+				return (perror("pipe"), 1);
+			pids[i] = fork();
+			if (pids[i] == -1)
+				return (perror("fork"), 1);
+			if (pids[i] == 0)
+				exec_child(cmd, shell, prev_fd, pipe_fd);
+			update_fds(&prev_fd, pipe_fd, cmd);
+			i++;
+		}
+		cmd = cmd->next;
+	}
+	return (0);
+}
+
+/*static int	exec_loop(t_shell *shell, pid_t *pids)
 {
 	t_cmd	*cmd;
 	int		pipe_fd[2];
@@ -321,7 +363,7 @@ static int	exec_loop(t_shell *shell, pid_t *pids)
 		cmd = cmd->next;
 	}
 	return (0);
-}
+}*/
 
 int	executor(t_shell *shell)
 {

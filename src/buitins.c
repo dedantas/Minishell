@@ -100,7 +100,7 @@ int	mini_exit(t_cmd *cmd, t_shell *shell)
 	if (cmd->args[2])
 	{
 		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
-		return (1);
+		return (shell->exit_status = 1, 1);
 	}
 	if (!is_number(cmd->args[1]))
 	{

@@ -82,17 +82,33 @@ char	**ft_envdup(char **arr);
 int		is_operator(char c);
 void	skip_whitespace(char **line);
 void	setup_signals(void);
+int		heredoc_stop(char *line, char *delimiter);
+int		handle_input(t_redir *redir);
+int		handle_output(t_redir *redir);
+int		handle_append(t_redir *redir);
+int		handle_heredoc(t_redir *redir);
+int		par_handle_heredoc(t_cmd *current, t_token *token);
 
 // Lexer
-t_token	*lexer(char *line);
+t_token	*lexer(char *line, t_shell *shell);
+char	*read_word(char **line);
+char	*read_quote(char **line, char quote);
+int		handle_operators(t_token **tokens, char **line);
 
 // Parser
-t_cmd	*parser(t_token *tokens);
+t_cmd	*parser(t_token *tokens, t_shell *shell);
 int		heredoc_handle(t_shell *shell);
+int		is_redir(t_type type);
+int		handle_redir(t_cmd *current, t_token **tokens);
+char	*trim_whitespace(char *str);
 
 // Expanded
 int		expand(t_shell *shell);
 char	*expand_word(t_shell *shell, char *str);
+char	*append_char(char *result, char c);
+char	*get_var_value(t_shell *shell, char *name);
+void	handle_quotes(char **line, int *in_quote, char *quote_char);
+char	*ex_handle_quotes(char *result, int *in_dquote);
 
 // Buitins
 int		mini_pwd(t_shell *shell);
@@ -122,6 +138,12 @@ int		executor(t_shell *shell);
 int		is_builtin(char *cmd_name);
 int		exec_builtin(t_cmd *cmd, t_shell *shell);
 int		is_state_changing(char *name);
+int		apply_redirs(t_cmd *cmd);
+char	*find_path(char *cmd, char **env);
+int		has_real_cmd(t_cmd *cmd);
+int		count_cmds(t_cmd *cmds);
+int		exec_single_builtin(t_shell *shell, t_cmd *cmd, pid_t *pids);
+int		wait_children(pid_t *pids, int n);
 
 // Free
 void	free_shell(t_shell *shell);

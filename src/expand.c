@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
-static char	*get_var_value(t_shell *shell, char *name)
+/*static char	*get_var_value(t_shell *shell, char *name)
 {
 	char	*value;
 
@@ -24,7 +24,77 @@ static char	*get_var_value(t_shell *shell, char *name)
 	return (ft_strdup(value));
 }
 
+static char	*append_char(char *result, char c)
+{
+	char	*tmp;
+	char	str[2];
+
+	str[0] = c;
+	str[1] = '\0';
+	tmp = ft_strjoin(result, str);
+	free(result);
+	return (tmp);
+}
+
+static char	*handle_quotess(char *result, int *in_dquote)
+{
+	char	*tmp;
+
+	tmp = ft_strjoin(result, "\"");
+	free(result);
+	*in_dquote = !(*in_dquote);
+	return (tmp);
+}*/
+
+static char	*handle_dollar(t_shell *shell, char *str, int *i, char *result)
+{
+	int		start;
+	char	*name;
+	char	*value;
+	char	*tmp;
+
+	if (!str[*i + 1] || (!ft_isalnum(str[*i + 1])
+			&& str[*i + 1] != '_' && str[*i + 1] != '?'))
+		return (append_char(result, '$'));
+	(*i)++;
+	start = *i;
+	if (str[*i] == '?')
+		(*i)++;
+	else
+		while (ft_isalnum(str[*i]) || str[*i] == '_')
+			(*i)++;
+	name = ft_substr(str, start, *i - start);
+	value = get_var_value(shell, name);
+	tmp = ft_strjoin(result, value);
+	free(result);
+	free(name);
+	free(value);
+	return (tmp);
+}
+
 char	*expand_word(t_shell *shell, char *str)
+{
+	int		i;
+	int		in_dquote;
+	char	*result;
+
+	i = 0;
+	in_dquote = 0;
+	result = ft_strdup("");
+	while (str[i])
+	{
+		if (str[i] == '"')
+			result = ex_handle_quotes(result, &in_dquote);
+		else if (str[i] == '$')
+			result = handle_dollar(shell, str, &i, result);
+		else
+			result = append_char(result, str[i]);
+		i++;
+	}
+	return (result);
+}
+
+/*char	*expand_word(t_shell *shell, char *str)
 {
 	int		i;
 	char	*result;
@@ -93,7 +163,7 @@ char	*expand_word(t_shell *shell, char *str)
 		}
 	}
 	return (result);
-}
+}*/
 
 static void	expand_args(t_shell *shell, t_cmd *cmd)
 {

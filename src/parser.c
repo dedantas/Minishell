@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
-void	add_redir(t_cmd *cmd, t_type type, char *file, int expand)
+/*void	add_redir(t_cmd *cmd, t_type type, char *file, int expand)
 {
 	t_redir	*redir;
 	t_redir	*tmp;
@@ -32,17 +32,17 @@ void	add_redir(t_cmd *cmd, t_type type, char *file, int expand)
 			tmp = tmp->next;
 		tmp->next = redir;
 	}
-}
+}*/
 
-int	is_redir(t_type type)
+/*int	is_redir(t_type type)
 {
 	return (type == IN || type == OUT
 		|| type == APPEND || type == HEREDOC);
-}
+}*/
 
 // parser.c - adicione esta função auxiliar no topo do arquivo
 
-static char	*trim_whitespace(char *str)
+char	*trim_whitespace(char *str)
 {
 	char	*start;
 	char	*end;
@@ -69,7 +69,7 @@ static char	*trim_whitespace(char *str)
 
 // parser.c - substitua a função handle_redir
 
-static int	handle_heredoc(t_cmd *current, t_token *token)
+/*static int	handle_heredoc(t_cmd *current, t_token *token)
 {
 	char	*trimmed;
 	int		do_expand;
@@ -86,9 +86,9 @@ static int	handle_heredoc(t_cmd *current, t_token *token)
 	add_redir(current, token->type, trimmed, do_expand);
 	free(trimmed);
 	return (1);
-}
+}*/
 
-static int	handle_redir(t_cmd *current, t_token **tokens)
+/*static int	handle_redir(t_cmd *current, t_token **tokens)
 {
 	if (!(*tokens)->next)
 	{
@@ -111,7 +111,7 @@ static int	handle_redir(t_cmd *current, t_token **tokens)
 		add_redir(current, (*tokens)->type, (*tokens)->next->value, 1);
 	*tokens = (*tokens)->next;
 	return (1);
-}
+}*/
 
 static int	handle_pipe(t_cmd **current, t_token *tokens)
 {
@@ -171,7 +171,7 @@ static int	check_empty_cmd(t_cmd *current, t_cmd *cmds)
 	return (1);
 }
 
-t_cmd	*parser(t_token *tokens)
+t_cmd	*parser(t_token *tokens, t_shell *shell)
 {
 	t_cmd	*cmds;
 	t_cmd	*current;
@@ -188,10 +188,10 @@ t_cmd	*parser(t_token *tokens)
 			add_cmd(&cmds, current);
 		}
 		if (!process_token(&current, &tokens, &cmds))
-			return (NULL);
+			return (shell->exit_status = 2, NULL);
 		tokens = tokens->next;
 	}
 	if (!check_empty_cmd(current, cmds))
-		return (NULL);
+		return (shell->exit_status = 2, NULL);
 	return (cmds);
 }

@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
-char	*read_quote(char **line, char quote)
+/*char	*read_quote(char **line, char quote)
 {
 	char	*start;
 	char	*end;
@@ -30,8 +30,60 @@ char	*read_quote(char **line, char quote)
 	return (NULL);
 }
 
-// Substitua a função read_word no lexer.c
-char	*read_word(char **line)
+static void	handle_quotes(char **line, int *in_quote, char *quote_char)
+{
+	if ((**line == '\'' || **line == '"') && !(*in_quote))
+	{
+		*in_quote = 1;
+		*quote_char = **line;
+		(*line)++;
+	}
+	else if (**line == *quote_char && *in_quote)
+	{
+		*in_quote = 0;
+		*quote_char = 0;
+		(*line)++;
+	}
+}*/
+
+/*static char	*append_char(char *buffer, char c)
+{
+	char	*temp;
+	char	str[2];
+
+	str[0] = c;
+	str[1] = '\0';
+	temp = ft_strjoin(buffer, str);
+	free(buffer);
+	return (temp);
+}*/
+
+/*char	*read_word(char **line)
+{
+	char	*buffer;
+	int		in_quote;
+	char	quote_char;
+
+	buffer = ft_strdup("");
+	in_quote = 0;
+	quote_char = 0;
+	while (**line && (!ft_isspace(**line) || in_quote))
+	{
+		if ((**line == '\'' || **line == '"')
+			|| (**line == quote_char && in_quote))
+		{
+			handle_quotes(line, &in_quote, &quote_char);
+			continue ;
+		}
+		if (!in_quote && is_operator(**line))
+			break ;
+		buffer = append_char(buffer, **line);
+		(*line)++;
+	}
+	return (buffer);
+}*/
+
+/*char	*read_word(char **line)
 {
 	char	*buffer;
 	char	*temp;
@@ -65,9 +117,9 @@ char	*read_word(char **line)
 		(*line)++;
 	}
 	return (buffer);
-}
+}*/
 
-static int	handle_operators(t_token **tokens, char **line)
+/*static int	handle_operators(t_token **tokens, char **line)
 {
 	if (**line == '|' )
 		return (add_token(tokens, new_token(PIPE, "|", NO)), (*line)++, 1);
@@ -82,7 +134,7 @@ static int	handle_operators(t_token **tokens, char **line)
 	if (**line == '>')
 		return (add_token(tokens, new_token(OUT, ">", NO)), (*line)++, 1);
 	return (0);
-}
+}*/
 
 static void	handle_word(t_token **tokens, char **line)
 {
@@ -93,7 +145,72 @@ static void	handle_word(t_token **tokens, char **line)
 	free(value);
 }
 
-t_token	*lexer(char *line)
+static int	handle_single_quote(t_token **tokens, char **line)
+{
+	char	*value;
+
+	value = read_quote(line, '\'');
+	if (!value)
+	{
+		ft_putendl_fd("minishell: unclosed quote", 2);
+		free_tokens(*tokens);
+		return (0);
+	}
+	add_token(tokens, new_token(WORD, value, SINGLE));
+	free(value);
+	return (1);
+}
+
+static int	handle_double_quote(t_token **tokens, char **line)
+{
+	char	*value;
+
+	value = read_quote(line, '"');
+	if (!value)
+	{
+		ft_putendl_fd("minishell: unclosed quote", 2);
+		free_tokens(*tokens);
+		return (0);
+	}
+	add_token(tokens, new_token(WORD, value, DOUBLE));
+	free(value);
+	return (1);
+}
+
+static void	handle_word_or_operator(t_token **tokens, char **line)
+{
+	if (handle_operators(tokens, line))
+		return ;
+	handle_word(tokens, line);
+}
+
+t_token	*lexer(char *line, t_shell *shell)
+{
+	t_token	*tokens;
+
+	tokens = NULL;
+	while (*line)
+	{
+		skip_whitespace(&line);
+		if (!*line)
+			break ;
+		if (*line == '\'')
+		{
+			if (!handle_single_quote(&tokens, &line))
+				return (shell->exit_status = 2, NULL);
+		}
+		else if (*line == '"')
+		{
+			if (!handle_double_quote(&tokens, &line))
+				return (shell->exit_status = 2, NULL);
+		}
+		else
+			handle_word_or_operator(&tokens, &line);
+	}
+	return (tokens);
+}
+
+/*t_token	*lexer(char *line)
 {
 	t_token	*tokens;
 	char	*value;
@@ -134,4 +251,4 @@ t_token	*lexer(char *line)
 			handle_word(&tokens, &line);
 	}
 	return (tokens);
-}
+}*/
