@@ -12,19 +12,6 @@
 
 #include "../minishell.h"
 
-// filho lê o heredoc
-/*static int	heredoc_stop(char *line, char *delimiter)
-{
-	if (!line)
-		return (1);
-	if (ft_strcmp(line, delimiter) == 0)
-	{
-		free(line);
-		return (1);
-	}
-	return (0);
-}*/
-
 static int	child_heredoc(int pipe_fd[2], char *delimiter, int expand,
 		t_shell *shell)
 {
@@ -51,7 +38,6 @@ static int	child_heredoc(int pipe_fd[2], char *delimiter, int expand,
 	exit(EXIT_SUCCESS);
 }
 
-// pai espera e retorna fd de leitura
 static int	parent_heredoc(int pipe_fd[2], pid_t pid)
 {
 	int	status;
@@ -67,7 +53,6 @@ static int	parent_heredoc(int pipe_fd[2], pid_t pid)
 	return (pipe_fd[0]);
 }
 
-// função principal
 int	heredoc_read(t_shell *shell, char *delimiter, int expand)
 {
 	pid_t	pid;
@@ -105,7 +90,6 @@ static int	handle_single_heredoc(t_shell *shell, t_redir *redir)
 	return (0);
 }
 
-// heredoc_handle.c - modifique a função heredoc_handle
 int	heredoc_handle(t_shell *shell)
 {
 	t_cmd	*cmd;
@@ -126,28 +110,3 @@ int	heredoc_handle(t_shell *shell)
 	}
 	return (0);
 }
-
-/*int	heredoc_handle(t_shell *shell)
-{
-	t_cmd	*cmd;
-	t_redir	*redir;
-
-	cmd = shell->cmds;
-	while (cmd)
-	{
-		redir = cmd->redirs;
-		while (redir)
-		{
-			if (redir->type == HEREDOC)
-			{
-				redir->heredoc_fd = heredoc_read(shell, redir->file,
-						redir->expand);
-				if (redir->heredoc_fd == -1)
-					return (1);
-			}
-			redir = redir->next;
-		}
-		cmd = cmd->next;
-	}
-	return (0);
-}*/

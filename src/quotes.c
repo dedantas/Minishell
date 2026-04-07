@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   quotes.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dedantas <dedantas@student.42porto.com>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/04/07 19:59:31 by dedantas          #+#    #+#             */
+/*   Updated: 2026/04/07 19:59:50 by dedantas         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
 char	*read_quote(char **line, char quote)
@@ -33,18 +45,6 @@ void	handle_quotes(char **line, int *in_quote, char *quote_char)
 		(*line)++;
 	}
 }
-
-/*char	*append_char(char *buffer, char c)
-{
-	char	*temp;
-	char	str[2];
-
-	str[0] = c;
-	str[1] = '\0';
-	temp = ft_strjoin(buffer, str);
-	free(buffer);
-	return (temp);
-}*/
 
 char	*read_word(char **line)
 {
