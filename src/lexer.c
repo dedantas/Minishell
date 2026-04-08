@@ -12,78 +12,6 @@
 
 #include "../minishell.h"
 
-char	*read_quote(char **line, char quote)
-{
-	char	*start;
-	char	*end;
-
-	start = *line + 1;
-	end = start;
-	while (*end && *end != quote)
-		end++;
-	if (*end == quote)
-	{
-		*line = end + 1;
-		return (ft_substr(start, 0, end - start));
-	}
-	*line = end;
-	return (NULL);
-}
-
-// Substitua a função read_word no lexer.c
-char	*read_word(char **line)
-{
-	char	*buffer;
-	char	*temp;
-	char	quote_char;
-	int		in_quote;
-
-	buffer = ft_strdup("");
-	in_quote = 0;
-	quote_char = 0;
-	while (**line && (!ft_isspace(**line) || in_quote))
-	{
-		if ((**line == '\'' || **line == '"') && !in_quote)
-		{
-			in_quote = 1;
-			quote_char = **line;
-			(*line)++;
-			continue ;
-		}
-		else if (**line == quote_char && in_quote)
-		{
-			in_quote = 0;
-			quote_char = 0;
-			(*line)++;
-			continue ;
-		}
-		if (!in_quote && is_operator(**line))
-			break ;
-		temp = ft_strjoin(buffer, (char[]){**line, 0});
-		free(buffer);
-		buffer = temp;
-		(*line)++;
-	}
-	return (buffer);
-}
-
-static int	handle_operators(t_token **tokens, char **line)
-{
-	if (**line == '|' )
-		return (add_token(tokens, new_token(PIPE, "|", NO)), (*line)++, 1);
-	if (**line == '<' && *(*line + 1) == '<' && *(*line + 2) == '-')
-		return (add_token(tokens, new_token(HEREDOC, "<<", NO)), *line += 3, 1);
-	if (**line == '<' && *(*line + 1) == '<')
-		return (add_token(tokens, new_token(HEREDOC, "<<", NO)), *line += 2, 1);
-	if (**line == '>' && *(*line + 1) == '>')
-		return (add_token(tokens, new_token(APPEND, ">>", NO)), *line += 2, 1);
-	if (**line == '<')
-		return (add_token(tokens, new_token(IN, "<", NO)), (*line)++, 1);
-	if (**line == '>')
-		return (add_token(tokens, new_token(OUT, ">", NO)), (*line)++, 1);
-	return (0);
-}
-
 static void	handle_word(t_token **tokens, char **line)
 {
 	char	*value;
@@ -93,10 +21,48 @@ static void	handle_word(t_token **tokens, char **line)
 	free(value);
 }
 
-t_token	*lexer(char *line)
+static int	handle_single_quote(t_token **tokens, char **line)
+{
+	char	*value;
+
+	value = read_quote(line, '\'');
+	if (!value)
+	{
+		ft_putendl_fd("minishell: unclosed quote", 2);
+		free_tokens(*tokens);
+		return (0);
+	}
+	add_token(tokens, new_token(WORD, value, SINGLE));
+	free(value);
+	return (1);
+}
+
+static int	handle_double_quote(t_token **tokens, char **line)
+{
+	char	*value;
+
+	value = read_quote(line, '"');
+	if (!value)
+	{
+		ft_putendl_fd("minishell: unclosed quote", 2);
+		free_tokens(*tokens);
+		return (0);
+	}
+	add_token(tokens, new_token(WORD, value, DOUBLE));
+	free(value);
+	return (1);
+}
+
+static void	handle_word_or_operator(t_token **tokens, char **line)
+{
+	if (handle_operators(tokens, line))
+		return ;
+	handle_word(tokens, line);
+}
+
+t_token	*lexer(char *line, t_shell *shell)
 {
 	t_token	*tokens;
-	char	*value;
 
 	tokens = NULL;
 	while (*line)
@@ -106,32 +72,16 @@ t_token	*lexer(char *line)
 			break ;
 		if (*line == '\'')
 		{
-			value = read_quote(&line, '\'');
-			if (!value)
-			{
-				ft_putendl_fd("minishell: unclosed quote", 2);
-				free_tokens(tokens);
-				return (NULL);
-			}
-			add_token(&tokens, new_token(WORD, value, SINGLE));
-			free(value);
+			if (!handle_single_quote(&tokens, &line))
+				return (shell->exit_status = 2, NULL);
 		}
 		else if (*line == '"')
 		{
-			value = read_quote(&line, '"');
-			if (!value)
-			{
-				ft_putendl_fd("minishell: unclosed quote", 2);
-				free_tokens(tokens);
-				return (NULL);
-			}
-			add_token(&tokens, new_token(WORD, value, DOUBLE));
-			free(value);
+			if (!handle_double_quote(&tokens, &line))
+				return (shell->exit_status = 2, NULL);
 		}
-		else if (handle_operators(&tokens, &line))
-			continue ;
 		else
-			handle_word(&tokens, &line);
+			handle_word_or_operator(&tokens, &line);
 	}
 	return (tokens);
 }
