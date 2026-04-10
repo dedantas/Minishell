@@ -35,6 +35,8 @@ static int	child_heredoc(int pipe_fd[2], char *delimiter, int expand,
 		free(out_line);
 	}
 	close(pipe_fd[1]);
+	free_shell(shell);
+	free_env(shell->env);
 	exit(EXIT_SUCCESS);
 }
 

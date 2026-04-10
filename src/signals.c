@@ -31,10 +31,10 @@ void	setup_signals(void)
 
 int	exec_single_builtin(t_shell *shell, t_cmd *cmd, pid_t *pids)
 {
-	if (apply_redirs(cmd) != 0)
-		return (free(pids), 1);
-	shell->exit_status = exec_builtin(cmd, shell);
 	free(pids);
+	if (apply_redirs(cmd) != 0)
+		return (1);
+	shell->exit_status = exec_builtin(cmd, shell);
 	return (shell->exit_status);
 }
 
@@ -47,5 +47,15 @@ int	heredoc_stop(char *line, char *delimiter)
 		free(line);
 		return (1);
 	}
+	return (0);
+}
+
+int	create_process(t_cmd *cmd, int *pipe_fd, pid_t *pid)
+{
+	if (cmd->next && pipe(pipe_fd) == -1)
+		return (perror("pipe"), 1);
+	*pid = fork();
+	if (*pid == -1)
+		return (perror("fork"), 1);
 	return (0);
 }

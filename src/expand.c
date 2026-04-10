@@ -19,9 +19,12 @@ static char	*handle_dollar(t_shell *shell, char *str, int *i, char *result)
 	char	*value;
 	char	*tmp;
 
-	if (!str[*i + 1] || (!ft_isalnum(str[*i + 1])
+	if (str[*i + 1] == '$' || !str[*i + 1] || (!ft_isalnum(str[*i + 1])
 			&& str[*i + 1] != '_' && str[*i + 1] != '?'))
+	{
+		(*i)++;
 		return (append_char(result, '$'));
+	}
 	(*i)++;
 	start = *i;
 	if (str[*i] == '?')
@@ -52,7 +55,10 @@ char	*expand_word(t_shell *shell, char *str)
 		if (str[i] == '"')
 			result = ex_handle_quotes(result, &in_dquote);
 		else if (str[i] == '$')
+		{
 			result = handle_dollar(shell, str, &i, result);
+			continue ;
+		}
 		else
 			result = append_char(result, str[i]);
 		i++;
