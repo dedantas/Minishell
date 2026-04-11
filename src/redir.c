@@ -18,6 +18,8 @@ void	add_redir(t_cmd *cmd, t_type type, char *file, int expand)
 	t_redir	*tmp;
 
 	redir = malloc(sizeof(t_redir));
+	if (!redir)
+		return ;
 	redir->type = type;
 	redir->file = ft_strdup(file);
 	redir->heredoc_fd = -1;

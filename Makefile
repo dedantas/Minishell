@@ -29,4 +29,11 @@ fclean: clean
 
 re: fclean all
 
+val:				
+					clear
+						valgrind --leak-check=full \
+						--show-leak-kinds=all \
+						--track-origins=yes \
+						--suppressions=readline_supressor ./$(NAME)
+
 .PHONY: all clean fclean re

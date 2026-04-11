@@ -35,19 +35,20 @@ static void	exec_child(t_cmd *cmd, t_shell *shell, int prev_fd, int *pipe_fd)
 	signal(SIGQUIT, SIG_DFL);
 	setup_pipes(cmd, prev_fd, pipe_fd);
 	if (apply_redirs(cmd) != 0)
-		exit(1);
+		e_exit(shell, 1);
 	if (is_builtin(cmd->args[0]) && !is_state_changing(cmd->args[0]))
-		exit(exec_builtin(cmd, shell));
+		e_exit(shell, exec_builtin(cmd, shell));
 	path = find_path(cmd->args[0], shell->env);
 	if (!path)
 	{
 		ft_putstr_fd(cmd->args[0], STDERR_FILENO);
 		ft_putendl_fd(": command not found", STDERR_FILENO);
-		exit(127);
+		e_exit(shell, 127);
 	}
 	execve(path, cmd->args, shell->env);
 	perror(cmd->args[0]);
-	exit(127);
+	free(path);
+	e_exit(shell, 127);
 }
 
 static void	update_fds(int *prev_fd, int pipe_fd[2], t_cmd *cmd)
@@ -77,13 +78,13 @@ static int	exec_loop(t_shell *shell, pid_t *pids)
 	{
 		if (cmd->args && cmd->args[0])
 		{
-			if (cmd->next && pipe(pipe_fd) == -1)
-				return (perror("pipe"), 1);
-			pids[i] = fork();
-			if (pids[i] == -1)
-				return (perror("fork"), 1);
+			if (create_process(cmd, pipe_fd, &pids[i]))
+				return (1);
 			if (pids[i] == 0)
+			{
+				free(pids);
 				exec_child(cmd, shell, prev_fd, pipe_fd);
+			}
 			update_fds(&prev_fd, pipe_fd, cmd);
 			i++;
 		}

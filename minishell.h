@@ -74,6 +74,7 @@ typedef struct s_shell
 	t_token	*tokens;
 	t_cmd	*cmds;
 	int		exit_status;
+	int		s_exit;
 }	t_shell;
 
 char	**ft_envdup(char **arr);
@@ -112,7 +113,7 @@ char	*ex_handle_quotes(char *result, int *in_dquote);
 
 // Buitins
 int		mini_pwd(t_shell *shell);
-int		mini_env(t_shell *shell);
+int		mini_env(t_cmd *cmd, t_shell *shell);
 int		mini_echo(t_cmd *cmd);
 int		mini_exit(t_cmd *cmd, t_shell *shell);
 int		mini_cd(t_cmd *cmd, t_shell *shell);
@@ -144,6 +145,7 @@ int		has_real_cmd(t_cmd *cmd);
 int		count_cmds(t_cmd *cmds);
 int		exec_single_builtin(t_shell *shell, t_cmd *cmd, pid_t *pids);
 int		wait_children(pid_t *pids, int n);
+int		create_process(t_cmd *cmd, int *pipe_fd, pid_t *pid);
 
 // Free
 void	free_shell(t_shell *shell);
@@ -151,5 +153,6 @@ void	free_tokens(t_token *tokens);
 void	free_cmds(t_cmd *cmds);
 void	free_env(char **env);
 void	free_arr(char **arr);
+void	e_exit(t_shell *shell, int code);
 
 #endif

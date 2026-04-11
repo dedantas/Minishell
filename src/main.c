@@ -12,6 +12,13 @@
 
 #include "../minishell.h"
 
+void	e_exit(t_shell *shell, int code)
+{
+	free_shell(shell);
+	free_env(shell->env);
+	exit(code);
+}
+
 static void	increment_shlvl(t_shell *shell)
 {
 	char	*shlvl_str;
@@ -39,6 +46,7 @@ static void	increment_shlvl(t_shell *shell)
 static void	init_shell(t_shell *shell, char **envp)
 {
 	shell->exit_status = 0;
+	shell->s_exit = 0;
 	shell->env = ft_envdup(envp);
 	shell->line = NULL;
 	shell->tokens = NULL;
@@ -56,6 +64,11 @@ static void	process_line(t_shell *shell)
 	shell->cmds = parser(shell->tokens, shell);
 	if (shell->cmds && !heredoc_handle(shell) && !expand(shell))
 		executor(shell);
+	if (g_signal)
+	{
+		shell->exit_status = g_signal;
+		g_signal = 0;
+	}
 	free_shell(shell);
 }
 
@@ -72,9 +85,11 @@ int	main(int ac, char **av, char **envp)
 		if (!shell.line)
 			break ;
 		process_line(&shell);
+		if (shell.s_exit)
+			break ;
 	}
 	free_shell(&shell);
 	free_env(shell.env);
 	rl_clear_history();
-	return (0);
+	return (shell.exit_status);
 }
