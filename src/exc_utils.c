@@ -24,7 +24,7 @@ int	exec_builtin(t_cmd *cmd, t_shell *shell)
 	if (ft_strcmp(name, "pwd") == 0)
 		return (mini_pwd(shell));
 	if (ft_strcmp(name, "env") == 0)
-		return (mini_env(shell));
+		return (mini_env(cmd, shell));
 	if (ft_strcmp(name, "exit") == 0)
 		return (mini_exit(cmd, shell));
 	if (ft_strcmp(name, "cd") == 0)

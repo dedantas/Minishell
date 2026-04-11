@@ -61,7 +61,7 @@ static void	add_env_var_raw(t_shell *shell, char *new_var)
 		count++;
 	new_env = malloc(sizeof(char *) * (count + 2));
 	if (!new_env)
-		return ;
+		return (free(new_var));
 	count = 0;
 	while (shell->env[count])
 	{
@@ -84,7 +84,10 @@ void	up_env_var(t_shell *shell, const char *str, int eq)
 	if (!shell || !shell->env || !str || eq <= 0)
 		return ;
 	name = ft_substr(str, 0, eq);
-	value = ft_strdup(str + eq + 1);
+	if ((int)ft_strlen(str) > eq)
+		value = ft_strdup(str + eq + 1);
+	else
+		value = ft_strdup("");
 	new_var = ft_strjoin3(name, "=", value);
 	if (!name || !value || !new_var)
 		return (free(name), free(value), free(new_var));

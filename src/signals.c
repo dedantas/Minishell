@@ -17,6 +17,7 @@ int	g_signal = 0;
 void	handle_sigint(int sig)
 {
 	(void)sig;
+	g_signal = 130;
 	write(1, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
@@ -52,6 +53,8 @@ int	heredoc_stop(char *line, char *delimiter)
 
 int	create_process(t_cmd *cmd, int *pipe_fd, pid_t *pid)
 {
+	pipe_fd[0] = -1;
+	pipe_fd[1] = -1;
 	if (cmd->next && pipe(pipe_fd) == -1)
 		return (perror("pipe"), 1);
 	*pid = fork();

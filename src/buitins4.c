@@ -12,16 +12,16 @@
 
 #include "../minishell.h"
 
-int	mini_env(t_shell *shell)
+int	mini_env(t_cmd *cmd, t_shell *shell)
 {
 	int	i;
 
 	if (!shell || !shell->env)
 		return (1);
-	if (shell->cmds && shell->cmds->args[1])
+	if (cmd->args[1])
 	{
 		ft_putstr_fd("env: ", 2);
-		ft_putstr_fd(shell->cmds->args[1], 2);
+		ft_putstr_fd(cmd->args[1], 2);
 		ft_putendl_fd(": No such file or directory", 2);
 		return (127);
 	}

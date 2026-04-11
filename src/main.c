@@ -64,6 +64,11 @@ static void	process_line(t_shell *shell)
 	shell->cmds = parser(shell->tokens, shell);
 	if (shell->cmds && !heredoc_handle(shell) && !expand(shell))
 		executor(shell);
+	if (g_signal)
+	{
+		shell->exit_status = g_signal;
+		g_signal = 0;
+	}
 	free_shell(shell);
 }
 

@@ -9,10 +9,9 @@
 /*   Updated: 2026/04/04 16:42:17 by dedantas         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "../minishell.h"
 
-static int	child_heredoc(int pipe_fd[2], char *delimiter, int expand,
+static void	child_heredoc(int pipe_fd[2], char *delimiter, int expand,
 		t_shell *shell)
 {
 	char	*line;
@@ -23,6 +22,8 @@ static int	child_heredoc(int pipe_fd[2], char *delimiter, int expand,
 	while (1)
 	{
 		line = readline("> ");
+		if (!line)
+			break ;
 		if (heredoc_stop(line, delimiter))
 			break ;
 		if (expand)
@@ -70,9 +71,8 @@ int	heredoc_read(t_shell *shell, char *delimiter, int expand)
 		return (-1);
 	}
 	if (pid == 0)
-		exit(child_heredoc(pipe_fd, delimiter, expand, shell));
-	else
-		return (parent_heredoc(pipe_fd, pid));
+		child_heredoc(pipe_fd, delimiter, expand, shell);
+	return (parent_heredoc(pipe_fd, pid));
 }
 
 static int	handle_single_heredoc(t_shell *shell, t_redir *redir)
