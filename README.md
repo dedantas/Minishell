@@ -1,66 +1,94 @@
-*This project has been created as part of the 42 curriculum by dedantas, vilopes.*
-
 # Minishell
 
-## Description
-
-Minishell is a simplified Unix shell developed as part of the 42 curriculum.  
-The goal of this project is to recreate a basic command-line interpreter that mimics the behavior of Bash.
-
-This includes:
-- Executing commands with arguments
-- Handling environment variables
-- Managing input/output redirections
-- Supporting pipes
-- Implementing built-in commands
-
-The project focuses on understanding process creation, file descriptors, and signal handling in Unix systems.
+A fully functional **Unix shell** built in **C**, designed to mimic the behavior of **Bash** while reinforcing knowledge of process management, pipes, signals, and parsing.
+It provides a complete interactive shell experience with built-in commands, environment handling, and robust execution flow.
 
 ## Features
 
-- Command execution (absolute, relative, and via PATH)
-- Built-in commands:
-  - `echo`
-  - `cd`
-  - `pwd`
-  - `export`
-  - `unset`
-  - `env`
-  - `exit`
-- Pipes (`|`)
-- Redirections:
-  - Input (`<`)
-  - Output (`>`)
-  - Append (`>>`)
-  - Heredoc (`<<`)
-- Environment variable expansion (`$VAR`)
-- Signal handling (`Ctrl+C`, `Ctrl+D`, `Ctrl+\`)
+- **Interactive prompt** for executing commands  
+- **Built-in commands**: `cd`, `echo`, `env`, `exit`, `export`, `pwd`, `unset`  
+- **Pipes** (`|`) and **redirections** (`<`, `>`, `>>`, `<<`)  
+- **Environment variable expansion** (e.g. `$USER`, `$PATH`)  
+- **Signal handling** for `Ctrl + C`, `Ctrl + D`, and `Ctrl + \`  
+- **Error messages** consistent with Bash  
+- **Memory-safe execution** (no leaks, fully cleaned after exit)  
 
-## Instructions
+## Tech Stack
 
-### Compilation
+- **C** – Core language  
+- **GNU Readline** – For interactive input
+- **POSIX system calls** – `fork`, `execvp`, `pipe`, `dup2`, `wait`, `signal`, etc.  
+- **Makefile** – For easy build and management
 
-Clone the repository and compile using `make`:
+## Installation
+
+1. Clone the repository:
 
 ```bash
-git clone <repository_url>
-cd minishell
+git clone https://github.com/dedantas/Minishell
+cd Minishell
+```
+
+2. Compile the project:
+
+```bash
 make
+```
 
-Execution
+3. Run the executable:
 
-Run the shell with:
-
+```bash
 ./minishell
+```
 
-Usage Example
-Understanding concepts like process management and pipes
-Clarifying system call behavior (fork, execve, etc.)
-Structuring the parsing logic
-Debugging specific edge cases
+## Usage
 
-All implementation decisions and final code were written and validated by the authors.
+- **Run commands** just like in Bash:
 
-Authors
-dedantas
-vilopes
+```bash
+minishell$ ls -l | grep minishell
+```
+
+- **Set and use environment variables:**
+
+```bash
+minishell$ export NAME= <name>
+minishell$ echo "Hello $NAME"
+Hello <name>
+```
+
+- **Redirect input and output:**
+
+```bash
+minishell$ cat < input.txt | grep "data" > output.txt
+```
+
+- **Exit the shell:**
+
+```bash
+minishell$ exit
+```
+
+## Compilation
+
+- Build the executable:
+
+```bash
+make
+```
+
+- Remove object files:
+
+```bash
+make clean
+```
+
+- Remove all binaries and rebuild:
+
+```bash
+make re
+```
+
+## License
+
+Educational project under 42 School academic policy.
